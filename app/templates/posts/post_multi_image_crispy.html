@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{# Taken from : https://medium.com/@adandan01/django-inline-formsets-example-mybook-420cc4b6225d #}
+  {% block customcss %}
+    {{ form.media.css }}
+  {% endblock %}
+{% block content %}
+<div class="col-md-8">
+     {% load crispy_forms_tags %}
+    <form action="" method="post" enctype="multipart/form-data">
+
+        {% crispy form %}
+
+        {# comment #}
+        {% crispy image_formset image_formset.form.helper %}
+        {% crispy video_formset video_formset.form.helper %}
+        {# endcomment #}
+
+        <table class="table">
+            {{ image_formset.management_form|crispy }}
+
+            {% for image_form in image_formset.forms %}
+                <tr class="{% cycle 'row1' 'row2' %} image_formset_row">
+                {% crispy image_form %}
+                </tr>
+            {% endfor %}
+        </table>
+        <table class="table">
+            {{ video_formset.management_form|crispy }}
+
+            {% for video_form in video_formset.forms %}
+                <tr class="{% cycle 'row1' 'row2' %} video_formset_row">
+                {% crispy video_form %}
+                </tr>
+            {% endfor %}
+        </table>
+        <input type="submit" value="Save"/> <a href="{% url 'post-list' %}">back to the list</a>
+    </form>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+  {% block customjs %}
+    {{ form.media.js }}
+  {% endblock %}
+<script type="text/javascript">
+    $('.image_formset_row').formset({
+        addText: 'add image',
+        deleteText: 'remove',
+        prefix: '{{ image_formset.prefix }}'
+    });
+    $('.video_formset_row').formset({
+        addText: 'add video',
+        deleteText: 'remove',
+        prefix: '{{ video_formset.prefix }}'
+    });
+</script>
+{% endblock %}

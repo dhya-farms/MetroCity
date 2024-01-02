@@ -1,0 +1,66 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block customcss %}
+{% if LANGUAGE_CODE == "te" %}
+  <link href="https://fonts.googleapis.com/css?family=Ramabhadra" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Mallanna" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Ramabhadra", "Mallana", sans-serif;
+      --body-font-family: "Mallana", sans-serif;
+      --title-font-weight: normal;
+      --body-font-weight: normal;
+      --title-font-size: 1.2rem;
+      --body-font-size: 0.8rem;
+    }
+    .green-timer {
+        color: #00B693;
+        border-color:#00B693;
+    }
+    .text-center {
+      text-align: center;
+    }
+  </style>
+{% else %}
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+    <style>
+    :root {
+      --title-font-family: "Noto Sans", sans-serif;
+      --body-font-family: "Noto Sans", sans-serif;
+      --title-font-weight: bold;
+      --body-font-weight: normal;
+      --title-font-size: 1rem;
+      --body-font-size: 0.8rem;
+    }
+    .green-timer {
+        color: #00B693;
+        border-color:#00B693;
+    }
+    </style>
+{% endif %}
+{% endblock customcss %}
+
+{% block content %}
+<div style="margin-top:10px">
+  <div class="col-md-2 col-lg-3"></div>
+  {% if series %}
+    <div class="card game_details m-0 p-0">
+        <div class="card-body pt-0 pb-0 pl-3 pr-3">
+          <div class="pt-2 pl-2 pr-2 align-items-center">
+            <div class="p-1 text-center">{% trans "New IPL quiz starts in" %}</div>
+            <div class="p-1 text-center"><strong>{{series.time}}</strong></div>
+            <div class="p-1 text-center green-timer"><strong>⏱️ {{series.timer}}</strong></div>
+          </div>
+        </div>
+    </div>
+  {% endif %}
+  {% if error %}
+    <div class="col-sm-12 col-md-8 col-lg-6">
+      <h5> {{error}}</h5>
+    </div>
+  {% endif %}
+</div>
+{% endblock content %}

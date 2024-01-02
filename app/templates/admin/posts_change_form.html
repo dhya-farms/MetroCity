@@ -1,0 +1,20 @@
+{% extends 'admin/change_form.html' %}
+{% load static %}
+{% block extrahead %}
+{{ block.super }}
+    <!-- Facebook Pixel Code -->
+    <script>
+      fbq('trackCustom', 'PageViewPosts');
+    </script>
+    <!-- End Facebook Pixel Code -->
+    <!-- Google Analytics Code -->
+    <script>
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'View',
+      eventAction: 'Create Post',
+      eventLabel: 'Submission Form Page',
+    });
+    </script>
+    <!-- End Google Analytics Code -->
+{% endblock %}

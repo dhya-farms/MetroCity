@@ -1,0 +1,136 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block customcss %}
+{% if LANGUAGE_CODE == "te" %}
+  <link href="https://fonts.googleapis.com/css?family=Ramabhadra" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Ramabhadra", "Mallana", sans-serif;
+      --body-font-family: "Mallana", sans-serif;
+      --title-font-weight: normal;
+      --body-font-weight: normal;
+      --title-font-size: 1.2rem;
+      --body-font-size: 0.8rem;
+    }
+  </style>
+{% else %}
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Noto Sans", sans-serif;
+      --body-font-family: "Noto Sans", sans-serif;
+      --title-font-weight: bold;
+      --body-font-weight: normal;
+      --title-font-size: 1.2rem;
+      --body-font-size: 1rem;
+    }
+  </style>
+{% endif %}
+{% endblock customcss %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-2 col-md-3 col-lg-4"></div>  <!-- needed for center align, adds a col on the left -->
+    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+      <div class="card mt-2 mb-2 p-2 w-100 font-normal referral-card">
+        {# Translators: Statement above contest selection dropdown #}
+        {%trans "Choose contest to view its leaderboard:" %}<br/>
+        <!--Contest: {{ start_date|date:"d M" }} - {{ end_date|date:"d M Y" }}-->
+        <select id="contest_dropdown" class="form-controls border border-warning rounded w-100 p-1 mt-2" style="border-radius:8px">
+          {% for contest in contests %}
+            {% if contest.id == current_contest.id %}
+              <option value="{{ contest.id }}" selected="selected">{{ contest.start_date|date:"d F" }} - {{ contest.end_date|date:"d F" }}</option>
+            {% else %}
+              <option value="{{ contest.id }}">{{ contest.start_date|date:"d F" }} - {{ contest.end_date|date:"d F" }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+        {% if user_details.points != 0 %}
+        <div class="font-bold mt-2">
+          {# Translators: Progress update header on referral leaderboard #}
+          {%trans "Your Progress:" %}
+          <div class="row mt-2">
+            <div class="col-6"><img height="26" src="https://media.getlokalapp.com/media/images/ic_rank_medal.svg"> {{ user_details.rank }} {%trans "rank" %}</div>
+            <div class="col-6"><img height="26" src="https://media.getlokalapp.com/media/images/coin.svg"> {{ user_details.points }} {%trans "points" %}</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>  <!-- end card -->
+
+      <div class="container font-bold mt-3 mb-3">
+        <img id="loading" src="https://media.getlokalapp.com/media/images/ic_spinner_small.gif" style="height:1.5em; display:none">
+        <div class="pt-2 pb-2 row align-items-center leaderboard-header">
+          <div class="col-1 table-column text-right">
+            <img id="rank" src="https://media.getlokalapp.com/media/images/ic_rank_medal.svg" height="22">
+          </div>
+          <div class="col-7 table-column font-bold pl-3">{%trans "Name" %}</div>
+          <div class="col-4 table-column font-bold text-right">{%trans "Points" %} <img height="18" src="https://media.getlokalapp.com/media/images/coin.svg"></div>
+        </div>
+        {% for user in user_list %}
+          {% if forloop.counter <= 10 %}
+          <div class="border-wrap-winner mt-2 row">
+          {% else %}
+          <div class="border-wrap-all mt-2 row">
+          {% endif %}
+          {% if user.id == user_details.id %}
+            <div class="pt-1 pb-1 w-100 row m-0 align-items-center" style="border-radius:6px; background:#ffe381">
+          {% else %}
+            <div class="pt-1 pb-1 w-100 row m-0 align-items-center" style="border-radius:6px; background:#fff">
+          {% endif %}
+              <div class="col-1 table-column text-right">{{ forloop.counter }}</div>
+              <div class="col-2 table-column text-center">
+                {% thumbnail user.profile_pic "30x30" crop="center" as im %}
+                  <img class="rounded-circle" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+                {% empty %}
+                  <img class="rounded-circle" height="30" src="https://media.getlokalapp.com/media/images/user.svg" width="30">
+                {% endthumbnail %}
+              </div>
+              <div class="col-7 table-column">{{ user.name }}</div>
+              <div class="col-2 table-column text-right">{{ user.points }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>  <!-- class container closing -->
+<!--    </div> --> <!-- leaderboard conatainer closing -->
+    </div> <!-- col-xs-12 closing -->
+  </div> <!-- row closing -->
+</div> <!-- container-fluid closing -->
+{% endblock content %}
+
+{% block customjs %}
+<script type="text/javascript">
+$(document).on("change", "#contest_dropdown", function(){
+   $("#loading").css("display","inline-block");
+   var contest_id = $(this).val();
+   const queryString = window.location.search;
+   const urlParams = new URLSearchParams(queryString);
+   const location_id = urlParams.get('location_id');
+   var data= {'contest_id': contest_id, 'request_type': 'ajax'};
+   if(location_id!=null){
+      data["location_id"]=location_id;
+   }
+   $.ajax({
+      {% comment %}
+        url: '{% url "user-leaderboard" %}'
+      {% endcomment %}
+      url: '/users/leaderboard/',
+      headers: {
+        'Authorization': 'Token {{ user_details.token }}'
+      },
+      method: 'GET',
+      data: data,
+      success: function (data) {
+        if (data) {
+          $("#outer-container").html(data);
+        }
+      }
+   });
+   /*text = 'users/leaderboard/?contest_id='+contest_id
+   Android.clickReload(text);*/
+});
+</script>
+{% endblock customjs %}

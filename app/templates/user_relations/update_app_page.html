@@ -1,0 +1,45 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block customcss %}
+<style>
+  #outer {
+    width: 100%;
+    text-align: center;
+  }
+
+  #inner {
+    display: inline-block;
+  }
+  #playstore_redirect_btn:active, #playstore_redirect_btn:focus, #playstore_redirect_btn:hover {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+  }
+</style>
+{% endblock customcss %}
+
+{% block content %}
+<div>
+  <div class="col-sm-12 col-md-8 col-lg-6">
+    <div id="outer">
+      <div id="inner">
+        <div class="inner justify-content-center" style="width:100%;margin-top:150px;">
+          <img src="https://media.getlokalapp.com/referral/notification_important.svg">
+        </div>
+        <div class="inner justify-content-center mt-2" style="width:100%;">
+          <div>{% trans "Please update your app to Invite your friends and win upto ₹210 everytime!" %}</div>
+        </div>
+        <div>
+          <a href="https://play.google.com/store/apps/details?id=get.lokal.localnews">
+            <div class="btn btn-warning font-bold-title text-dark-grey ramabhadra-button w-100 mt-4" style="height:44px;padding:10px;" id="playstore_redirect_btn">
+              {% trans "Update app now" %} <img height="14" src="https://getlokal-input.s3.ap-south-1.amazonaws.com/referral/redeem-arrow.png" style="margin-bottom:0.25rem" width="14">
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

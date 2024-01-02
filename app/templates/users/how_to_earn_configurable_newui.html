@@ -1,0 +1,197 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block customcss %}
+{% if LANGUAGE_CODE == "te" %}
+  <link href="https://fonts.googleapis.com/css?family=Ramabhadra" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Mallanna" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Ramabhadra", "Mallana", sans-serif;
+      --english-title-font-family: "Roboto-Bold", sans-serif;
+      --body-font-family: "Mallana", sans-serif;
+      --english-body-font-family: "Roboto", sans-serif;
+      --title-font-weight: normal;
+      --body-font-weight: normal;
+      --title-font-size: 1.2rem;
+      --body-font-size: 0.8rem;
+    }
+  </style>
+{% else %}
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Noto Sans", sans-serif;
+      --body-font-family: "Noto Sans", sans-serif;
+      --title-font-weight: bold;
+      --body-font-weight: normal;
+      --title-font-size: 1rem;
+      --body-font-size: 0.8rem;
+    }
+  </style>
+{% endif %}
+{% endblock customcss %}
+
+{% block content %}
+<div style="margin-top:10px">
+  <div class="col-md-2 col-lg-3"></div>
+  <div class="col-sm-12 col-md-8 col-lg-6">
+    <div class="card mt-2 mb-2 p-3 w-100 referral-card font-bold">
+      {% if current_contest %}
+        {{ current_contest.start_date|date:"d F" }} - {{ current_contest.end_date|date:"d F" }}
+      {% elif previous_contest %}
+        {{ previous_contest.start_date|date:"d F" }} - {{ previous_contest.end_date|date:"d F" }}
+      {% else %}
+        {# Translators: There is no competition at this time. Please check back later. #}
+        <h5 class="font-bold-title text-danger">{% trans "ఈ సమయంలో పోటీ ఏదీ లేదు. దయచేసి తర్వాత మళ్లీ తనిఖీ చేయండి." %}</h5>
+      {% endif %}
+      {% if user_details.current_points > 0 %}
+        <div class="mt-1 mb-1">{%trans "Your Progress:" %}</div>
+      {% elif user_details.previous_points > 0 %}
+        <div class="mt-1 mb-1">{%trans "Your Performance:" %}</div>
+      {% endif %}
+
+      <div class="row align-items-end mt-1">
+        {% if user_details.current_points > 0 %}
+          <div class="col-6">
+            <img class="align-bottom" height="26" src="https://media.getlokalapp.com/media/images/ic_rank_medal.svg">
+            <span class="english-font-bold-title ml-1" style="font-size:24px;">{{ user_details.current_rank }}</span> {%trans "rank" %}
+          </div>
+          <div class="col-6">
+            <img class="align-bottom" height="26" src="https://media.getlokalapp.com/media/images/coin.svg">
+            <span class="english-font-bold-title ml-1" style="font-size:24px;">{{ user_details.current_points }}</span> {%trans "points" %}
+          </div>
+        {% elif user_details.current_points == 0 %}
+          <div class="col-6">
+            {%trans "Refer now to win!" %}
+          </div>
+          <div class="col-6">
+            <img class="align-bottom" height="26" src="https://media.getlokalapp.com/media/images/coin.svg">
+            <span class="english-font-bold-title ml-1" style="font-size:24px;">0</span> {%trans "points" %}
+          </div>
+        {% elif user_details.previous_points > 0 %}
+          <div class="col-6">
+            <img class="align-bottom" height="26" src="https://media.getlokalapp.com/media/images/ic_rank_medal.svg">
+            <span class="english-font-bold-title ml-1" style="font-size:24px;">{{ user_details.previous_rank }}</span> {%trans "rank" %}
+          </div>
+          <div class="col-6">
+            <img class="align-bottom" height="26" src="https://media.getlokalapp.com/media/images/coin.svg">
+            <span class="english-font-bold-title ml-1" style="font-size:24px;">{{ user_details.previous_points }}</span> {%trans "points" %}
+          </div>
+        {% elif user_details.previous_points == 0 %}
+          <div class="col-12 font-normal"> {%trans "You did not participate in this contest" %} </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if current_contest %}
+    <a class="btn btn-warning font-bold-title text-dark-grey ramabhadra-button w-100 mt-2 p-2" href="#" onclick="sendToAndroid('{{ user_details.share_uri }}')">
+      {# Translators: Refer and Earn #}
+      {% trans "Refer and Earn" %}
+      <img height="16" src="https://media.getlokalapp.com/media/images/ic_share_black_transp.svg" style="margin-bottom:0.25rem" width="16">
+    </a>
+    {% endif %}
+
+    <div style="margin-top:20px">
+      {% comment %}
+      {% if current_contest %}
+        {# Translators: Deadline for contest is - (date) #}
+        <h5 class="font-bold-title">{% blocktrans with date=current_contest.end_date|date:"d M Y"%} లీడర్ బోర్డ్ కాంపిటీషన్ కు ఆఖరి తేదీ - {{ date }}.{% endblocktrans %}</h5>
+      {% elif previous_contest %}
+        {# Translators: There is no competition at this time. Please check back later. #}
+        <h5 class="font-bold-title text-danger">{% trans "ఈ సమయంలో పోటీ ఏదీ లేదు. దయచేసి తర్వాత మళ్లీ తనిఖీ చేయండి." %}</h5>
+      {% endif %}
+      {% endcomment %}
+      <div id="rules" class="font-normal">
+        {% if point_slabs %}
+          {{ point_slabs | safe }}
+        {% else %}
+        <div class="font-bold-title">Rules </div>
+        <div class="row border border-top-0 border-left-0 border-right-0 align-items-center p-1">
+          <div class="col-2"><img class="align-bottom" height="30" src="https://media.getlokalapp.com/media/images/ic_share_white_on_yellow.svg"></div>
+          <div class="col-10">You can share your referral link by clicking on the “Refer and Earn” button</div>
+        </div>
+        <div class="row border border-top-0 border-left-0 border-right-0 align-items-center p-1">
+          <div class="col-2"><img class="align-bottom" height="30" src="https://media.getlokalapp.com/media/images/ic_download_white_on_blue.svg"></div>
+          <div class="col-10">Your friends must install the app from your referral link and they have to login after installing the app from the referral link</div>
+        </div>
+        <div class="row border border-top-0 border-left-0 border-right-0 align-items-center p-1">
+          <div class="col-2"><img class="align-bottom" height="36" src="https://media.getlokalapp.com/media/images/ic_calendar.svg"></div>
+          <div class="col-10">If your friend uses the app for at least 3 days after installing your referral would be considered successful</div>
+        </div>
+        <div class="row border border-top-0 border-left-0 border-right-0 align-items-center p-1">
+          <div class="col-2"><img class="align-bottom" height="29" src="https://media.getlokalapp.com/media/images/coin.svg"></div>
+          <div class="col-10">You will get 10 points for each friend you successfully refer</div>
+        </div>
+        {% comment %}
+        <div class="row align-items-center p-1">
+          <div class="col-2"><img class="align-bottom" height="36" src="https://media.getlokalapp.com/media/images/ic_rank_medal.svg"></div>
+          <div class="col-10">Top 10 in the leaderboard will get prizes* as mentioned below</div>
+        </div>
+        <div class="border-wrap-winner m-2 row font-bold-title">
+          <div class="pt-1 pb-1 w-100 row m-0 align-items-center" style="border-radius:6px; background:#fff">
+            <div class="col-6 table-column">1st-3rd Ranks</div>
+            <div class="col-6 table-column text-right">Rs 3000 cash</div>
+          </div>
+        </div>
+        <div class="border-wrap-winner m-2 row font-bold-title">
+          <div class="pt-1 pb-1 w-100 row m-0 align-items-center" style="border-radius:6px; background:#fff">
+            <div class="col-6 table-column">4th-6th Ranks</div>
+            <div class="col-6 table-column text-right">Rs 2000 cash</div>
+          </div>
+        </div>
+        <div class="border-wrap-winner m-2 row font-bold-title">
+          <div class="pt-1 pb-1 w-100 row m-0 align-items-center" style="border-radius:6px; background:#fff">
+            <div class="col-6 table-column">7th-10th Ranks</div>
+            <div class="col-6 table-column text-right">Rs 1000 cash</div>
+          </div>
+        </div>
+        {% endcomment %}
+        {% endif %}
+      </div>
+
+      {% if current_contest %}
+      <a class="btn btn-warning font-bold-title text-dark-grey ramabhadra-button w-100 mt-2 p-2" href="#" onclick="sendToAndroid('{{ user_details.share_uri }}')">
+        {# Translators: Refer and Earn #}
+        {% trans "Refer and Earn" %}
+        <img height="16" src="https://media.getlokalapp.com/media/images/ic_share_black_transp.svg" style="margin-bottom:0.25rem" width="16">
+      </a>
+      {% endif %}
+
+      <div class="font-normal text-muted" style="margin-top:20px">
+        <!--<h5 class="telugu-bold-title">Terms and Conditions :</h5>-->
+        {# Translators: Terms and conditions - नियम और शर्तें #}
+        <h5 class="font-bold-title">{% trans "షరతులు మరియు నిబంధనలు" %}</h5>
+        <div class="">
+          <ul>
+            {# Translators: Terms & Conditions of referral #}
+            <li>{% trans "If the referred user has already used the app before, the referral would be invalid" %}</li>
+            <li>{% trans "Lokal reserves the right to deny / change the contest rules and rewards anytime." %}</li>
+          </ul>
+          {# Translators: If you have any questions regarding the reward please send feedback to 'Lokal' #}
+          {% trans "రివార్డుకు సంబంధించి ఇంకా ఏమైనా సందేహాలుంటే.. 'లోకల్'కు ఫీడ్ బ్యాక్ పంపండి" %}
+        </div>
+      </div>
+    </div>
+    <div class="text-center" style="margin-bottom:20px">
+      <a class="btn btn-outline-warning w-100" href="#" onclick="Android.clickFeedback()">
+         {# Translators: Button to submit Feedback for Referral program #}
+         {%trans "Contact Us" %}
+      </a><br/>
+      {# Translators: * We will respond to your feedback within 24 hours #}
+      <div class="text-muted font-normal">{% trans "* మేము 24 గంటలలో మీ ఫీడ్బ్యాక్  పై స్పందిస్తాం" %}</div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block customjs %}
+<script type="text/javascript">
+  function sendToAndroid(text){
+    Android.clickShare(text);
+  }
+</script>
+{% endblock customjs %}

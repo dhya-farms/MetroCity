@@ -1,0 +1,241 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block customcss %}
+{% if LANGUAGE_CODE == "te" %}
+  <link href="https://fonts.googleapis.com/css?family=Ramabhadra" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Mallanna" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Ramabhadra", "Mallana", sans-serif;
+      --body-font-family: "Mallana", sans-serif;
+      --title-font-weight: normal;
+      --body-font-weight: normal;
+      --title-font-size: 1.2rem;
+      --body-font-size: 0.8rem;
+    }
+  </style>
+{% else %}
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+  <style>
+    :root {
+      --title-font-family: "Noto Sans", sans-serif;
+      --body-font-family: "Noto Sans", sans-serif;
+      --title-font-weight: bold;
+      --body-font-weight: normal;
+      --title-font-size: 1.2rem;
+      --body-font-size: 1rem;
+    }
+  </style>
+{% endif %}
+{% endblock customcss %}
+
+{% block content %}
+<div style="margin-top:10px">
+  <div class="col-md-2 col-lg-3"></div>
+  <div class="col-sm-12 col-md-8 col-lg-6">
+    <div class="card text-center">
+      <!--<img class="card-img-top" src="" alt="Card image cap">-->
+      <div class="card-body">
+        {# Translators:  Share with your friends and get 10 points #}
+        <h5 class="card-title font-bold-title">{% blocktrans %} మీ స్నేహితులతో పంచుకోండి మరియు 10 పాయింట్స్ పొందండి. {% endblocktrans %}</h5>
+        {% if user_details.current_points >= 0 %}
+        <p class="card-text font-normal" style="font-size: 1.5em">
+          <img height="60" src="https://media.getlokalapp.com/media/images/coin.svg" width="60"> <br/>
+          {# Translators: Current Contest : X points  #}
+          {% blocktrans with points=user_details.current_points %}ప్రస్తుత పోటీ : {{ points }} పాయింట్స్{% endblocktrans %}</p>
+        {% else %}
+        <p class="card-text" style="font-size: 1.5em">
+          <img height="60" src="https://media.getlokalapp.com/media/images/coin.svg" width="60"> <br/>
+          {# Translators: Current Contest : 0 points  #}
+          {% trans "ప్రస్తుత పోటీ : 0 పాయింట్స్" %}
+          <!--ఈ సమయంలో పోటీ ఏదీ లేదు. </br>దయచేసి తర్వాత మళ్లీ తనిఖీ చేయండి.-->
+          </p>
+        {% endif %}
+        {% if user_details.previous_points >= 0 %}
+        <p class="card-text font-bold" style="font-size: 1em">
+          {# Translators: Previous content : X points  #}
+          {% blocktrans with points=user_details.previous_points %}మునుపటి పోటీ : {{ points }} పాయింట్స్{% endblocktrans %}</p>
+        {% endif %}
+        <!--<a href="{{ user_details.share_uri }}" class="btn btn-warning telugu-bold-title ramabhadra-button">-->
+        <a href="#" onclick="sendToAndroid('{{ user_details.share_uri }}')" class="btn btn-warning font-bold-title ramabhadra-button">
+          <img height="16" src="https://media.getlokalapp.com/media/images/share-white-transp.svg" style="margin-bottom:0.25rem" width="16">
+          {# Translators: Refer and Win #}
+          {% trans "రెఫర్ చేసి గెలవండి" %}
+        </a>
+      </div>
+    </div>
+    <div style="margin-top:20px">
+      <!--<h5 class="telugu-bold-title">లీడర్ బోర్డ్ కాంపిటీషన్ కు ఆఖరి తేదీ. 31 డిసెంబర్ 2018</h5>-->
+      {% if user_details.current_points >= 0 %}
+        {# Translators: Deadline for leaderboard contest is - (date) #}
+        <h5 class="font-bold-title">{% blocktrans with date=end_date|date:"d M Y"%} లీడర్ బోర్డ్ కాంపిటీషన్ కు ఆఖరి తేదీ - {{ date }}.{% endblocktrans %}</h5>
+      {% else %}
+        {# Translators: There is no competition at this time. Please check back later. #}
+        <h5 class="font-bold-title text-danger">{% trans "ఈ సమయంలో పోటీ ఏదీ లేదు. దయచేసి తర్వాత మళ్లీ తనిఖీ చేయండి." %}</h5>
+      {% endif %}
+      <!--<h5 class="telugu-bold text-danger">Paytm రివార్డ్ ఇంకా పొందనివారికి ముఖ్యగమనిక:</h5>-->
+      <!--<div class="telugu-normal" style="margin-top:-2px">కాంటెస్ట్ రివార్డ్ పొందుటకు KYC చేయబడిన Paytm నెంబర్ తప్పనిసరి. ఒకవేళ  మీ నెంబర్ పై KYC చేయబడిన Paytm అకౌంట్  లేనట్లయితే , దయచేసి Paytm అకౌంట్ కలిగిన మరియు  KYC చేయబడిన వేరే నెంబర్ ఫీడ్బ్యాక్ ద్వారా  31 -01 -2019  లోపు  తెలియచేయగలరు.</div>-->
+      {# Translators: Important points to get PayTM reward #}
+      <h5 class="font-bold">{% trans "Paytm రివార్డ్ పొందుటకు ముఖ్యగమనిక:" %}</h5>
+      {# Translators: Your referred friend must use the app for 3 days, otherwise you will not get the reward #}
+      <div class="font-normal" style="margin-top:-2px">{% trans "మీరు రెఫర్ చేసిన ఫ్రెండ్ యాప్ ని కనీసం 3 రోజులు వాడాలి, లేకపోతే మీకు ఆ రెఫరల్ కి రివార్డ్ లభించదు." %}</div>
+      <br/>
+      <div id="points_table">
+        {# Translators: Get rewards based on your points #}
+        <h5 class="font-bold">{% trans "పాయింట్స్ ఆధారంగా రివార్డులను పొందండి" %}</h5>
+        <!--Every friend who joins from your referral, you get <b>Rs. 7 PayTM Cash</b>-->
+        <!--<h5 class="telugu-bold">మీ రెఫరల్ లింక్ నుంచి ఇన్స్టాల్ చేసిన ప్రతి ఫ్రెండ్ కి మీకు Rs . 7  లభిస్తాయి.</h5>-->
+        <!--<div class="text-muted">-->
+          <!--&lt;!&ndash;Example :&ndash;&gt;-->
+          <!--<div class="telugu-normal">ఉదాహరణకు,</div>-->
+          <!--<table>-->
+          <!--<tbody>-->
+            <!--<tr>-->
+              <!--<td class="align-middle">5 Installs </td>-->
+              <!--<td class="align-middle"> Rs. 35 PayTM Cash</td>-->
+            <!--</tr>-->
+            <!--<tr>-->
+              <!--<td class="align-middle">13 Installs </td>-->
+              <!--<td class="align-middle"> Rs. 91 PayTM Cash</td>-->
+            <!--</tr>-->
+            <!--<tr>-->
+              <!--<td class="align-middle">50 Installs </td>-->
+              <!--<td class="align-middle"> Rs. 350 PayTM Cash</td>-->
+            <!--</tr>-->
+            <!--<tr>-->
+              <!--<td class="align-middle">100 Installs </td>-->
+              <!--<td class="align-middle"> Rs. 700 PayTM Cash</td>-->
+            <!--</tr>-->
+          <!--</tbody>-->
+          <!--</table>-->
+        <!--</div>-->
+        <!--<table class="text-muted">-->
+        <!--<tbody>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">1 - 49 Points </td>-->
+            <!--<td class="align-middle"> Rs. 5 PayTM Cash</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">50 - 99 Points </td>-->
+            <!--<td class="align-middle"> Rs. 30 PayTM Cash</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">100 - 149 Points </td>-->
+            <!--<td class="align-middle"> Rs. 65 PayTM Cash</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">150 - 199 Points </td>-->
+            <!--<td class="align-middle"> Rs. 120 PayTM Cash</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">200 - 299 Points </td>-->
+            <!--<td class="align-middle"> Rs. 175 PayTM Cash</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">300 - 499 Points </td>-->
+            <!--<td class="align-middle"> Rs. 250 PayTM Cash</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td class="align-middle">500+ Points </td>-->
+            <!--<td class="align-middle"> Rs. 400 PayTM Cash</td>-->
+          <!--</tr>-->
+        <!--</tbody>-->
+        <!--</table>-->
+        <table class="text-muted font-normal">
+        <tbody>
+          <tr>
+            <td class="align-middle">1-150 </td>
+            {# Translators: 1-150 points - For every x points you will get Rs y #}
+            <td class="align-middle">{% trans " ప్రతి 10 పాయింట్లకి Rs.7 లభిస్తాయి" %}</td>
+          </tr>
+          <tr>
+            <td class="align-middle">151-300 </td>
+            {# Translators: 151-300 points - For every x points you will get Rs y #}
+            <td class="align-middle">{% trans "ప్రతి 10 పాయింట్లకి Rs.5 లభిస్తాయి" %}</td>
+          </tr>
+          <tr>
+            <td class="align-middle">300+ </td>
+            {# Translators: 300+ points - For every x points you will get Rs y #}
+            <td class="align-middle">{% trans "ప్రతి 10 పాయింట్లకి Rs.3 లభిస్తాయి" %}</td>
+          </tr>
+          <tr>
+            {# Translators: Max Reward #}
+            <td class="align-middle">{% trans "గరిష్ట రివార్డ్" %}</td>
+            <td class="align-middle"> Rs.250 </td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+
+      <div class="font-normal" style="margin-top:20px">
+        {# Translators: For example #}
+        <h5 class="font-bold-title">{% trans "ఉదాహరణకు" %}</h5>
+        <div class="">
+          <ol>
+            {# Translators: For 80 points get 56 Rupees #}
+            <li>{% trans "80 పాయింట్లకి  8x7 = Rs.56  లభిస్తాయి" %}</li>
+            {# Translators: For 200 points you get 130 Rupees #}
+            <li>{% trans "200 పాయింట్లకి  15x7 + 5x5 = Rs.130  లభిస్తాయి" %}</li>
+            {# Translators: For 400 points you get 210 Rupees #}
+            <li>{% trans "400 పాయింట్లకి  15x7 + 15x5 + 10x3 = Rs.210  లభిస్తాయి" %}</li>
+            {# Translators: For 600 points you get max reward 250 rupees #}
+            <li>{% trans "600 పాయింట్లకి  గరిష్ట రివార్డ్ Rs.250  లభిస్తాయి" %}</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="font-normal" style="margin-top:20px">
+        <!--<h5 class="telugu-bold-title">Terms and Conditions :</h5>-->
+        {# Translators: Terms and conditions - नियम और शर्तें #}
+        <h5 class="font-bold-title">{% trans "షరతులు మరియు నిబంధనలు" %}</h5>
+        <div class="">
+          <ol>
+            {# Translators: 1. You should have the latest version of Lokal App #}
+            <li>{% trans "మీరు తప్పకుండా లోకల్ యాప్ లేటెస్ట్ వెర్షన్ కలిగి ఉండాలి." %}</li>
+            {# Translators: 2. Your friends should: #}
+            <li>{% trans "మీ స్నేహితుడు తప్పనిసరిగా:" %}
+              <ul>
+                {# Translators: a. They must download Lokal app using the link you share #}
+                <li>{% trans "మీరు షేర్ చేసే లింక్ తోనే Lokal App డౌన్లొడ్ చేసుకోవాలి." %}</li>
+                {# Translators: b. They should not have used the Lokal app previously. #}
+                <li>{% trans "గతంలో వాళ్ళ ఫోన్ నంబర్స్ మీద Lokal App ను వినియోగించి ఉండకూడదు." %}</li>
+                {# Translators: c. They should login into the app using their phone number. #}
+                <li>{% trans "App లో తమ ఫోన్ నెంబర్ తో లాగిన్ చేసుకోవాలి" %}</li>
+              </ul>
+            </li>
+            {# Translators: d. PayTM Award is given within a week of the completion of the competition. #}
+            <li>{% trans "కాంపిటీషన్ పూర్తైన వారం రోజుల్లో పేటీఎం అవార్డ్ ఇవ్వబడుతుంది." %}</li>
+            <!--<li>లీడర్ బోర్డ్ లో ఉన్న విజేతలకు.. కాంపిటీషన్ పూర్తైన పదిహేను రోజుల్లోగా బహుమతులు పంపబడుతాయి.</li>-->
+            {# Translators: e. PayTM Award will be sent to your logged in phone number. #}
+            <li>{% trans "మీరు లాగిన్ అయిన ఫోన్ నంబర్ కు పేటీఎం మనీ ట్రాన్స్ ఫర్ చేయబడుతుంది." %}</li>
+            {# Translators: f. PayTM KYC is mandatory to get award #}
+            <li>{% trans "కాంటెస్ట్ రివార్డ్ పొందుటకు KYC చేయబడిన Paytm నెంబర్ తప్పనిసరి." %}</li>
+            {# Translators: g. If you have any questions regarding the reward please send feedback to 'Lokal' #}
+            <li>{% trans "రివార్డుకు సంబంధించి ఇంకా ఏమైనా సందేహాలుంటే.. 'లోకల్'కు ఫీడ్ బ్యాక్ పంపండి" %}</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="text-center" style="margin-bottom:20px">
+      <a href="#" onclick="Android.clickFeedback()" class="btn btn-outline-warning">
+         {# Translators: Button to submit Feedback for Referral program #}
+         {%trans "Feedback" %}
+      </a><br/>
+      {# Translators: * We will respond to your feedback within 24 hours #}
+      <div class="text-muted font-normal">{% trans "* మేము 24 గంటలలో మీ ఫీడ్బ్యాక్  పై స్పందిస్తాం" %}</div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block customjs %}
+<script type="text/javascript">
+  function sendToAndroid(text){
+    Android.clickShare(text);
+  }
+</script>
+{% endblock customjs %}

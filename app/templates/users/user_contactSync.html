@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+  {% block customcss %}
+    {{ form.media.css }}
+  {% endblock %}
+
+{% block content %}
+<div class="col-md-8">
+    <br/>
+    <h1>Contact Sync</h1>
+    <form action="" method="post" enctype="multipart/form-data" class="post-form">
+        {% block form %}
+            {% crispy form %}
+        {% endblock %}
+    </form>
+    <br/>
+  </div>
+
+{% endblock %}
+
+  {% block customjs %}
+    {{ form.media.js }}
+  {% endblock %}

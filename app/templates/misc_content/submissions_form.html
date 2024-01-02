@@ -1,0 +1,42 @@
+{% extends 'misc_content/google_photos_base.html' %}
+
+  {% block customcss %}
+    {{ form.media.css }}
+  {% endblock %}
+{% block google-photos-app %}
+<div class="col-md-8">
+  <h5>{{ form.TITLE }}</h5>
+  {% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+  {% endif %}
+  <form action="" class="post-form" enctype="multipart/form-data" method="post">
+      {% csrf_token %}
+        {{ form.as_p }}
+      <input class="save btn btn-primary" type="submit" value="Submit" />
+    </form>
+  <br/>
+</div>
+{% endblock %}
+
+  {% comment %}
+  {% block customjs %}
+  <script type="text/javascript">
+      var hash = location.hash;
+      console.log(hash);
+      let params = new URLSearchParams(hash);
+      var token = params.get("access_token"); // "foo"
+      console.log(token);
+  </script>
+  {% endblock %}
+  {% endcomment %}

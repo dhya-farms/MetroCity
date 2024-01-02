@@ -1,0 +1,191 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block content %}
+<div style="margin-top:10px;line-height:1.6;margin-bottom:120px;">
+  <div class="col-md-2 col-lg-3"></div>
+  <div class="col-12 col-md-8 col-lg-6">
+<!--    When the campaign is in PAUSED state. Refer ReferralCampaignStatus in constants -->
+    {% if status == 2 %}
+    <div class="mt-2 mb-2 p-3 w-100" style="background-color:#FDE7EB;color:#F3425F;">
+      <div class="row">
+        <div class="col-1"><img class="align-bottom" height="24" src="https://media.getlokalapp.com/referral/warning-red.png"></div>
+        <div class="col">{% trans "Sorry! This campaign is paused. Please try again later." %}</div>
+      </div>
+    </div>
+    {% endif %}
+    {% if total_earnings > 0 %}
+      <div class="card mt-2 mb-2 p-3 w-100 referral-card font-bold">
+        <div class="row border border-bottom-0 border-top-0 border-left-0 border-right-0 align-items-center p-1">
+          <div class="w-50 text-center border border-bottom-0 border-top-0 border-left-0 border-right-2">
+            <span class="text-center" style="font-size:30px;">₹ {{ total_earnings }}</span><br/>
+            <span style="font-size:12px;font-weight:normal;">{% trans "Your total reward" %}</span>
+          </div>
+          <div class="w-50 text-center border border-bottom-0 border-top-0 border-left-0 border-right-0">
+            <span class="text-center" style="font-size:30px;">₹ {{ redeemed_earnings }}</span><br/>
+            <span style="font-size:12px;font-weight:normal;">{% trans "Reward received to bank" %}</span>
+          </div>
+          <div class="col-sm-12 text-center">
+            <br/>
+            {% if redeem_button.is_active %}
+              <a class="btn btn-outline-warning w-100 font-weight-bold" href="#" style="background-color:#FFF1CC;color:#66676B;" id="redeem_button">
+                {{ redeem_button.text }}
+                <img src="https://media.getlokalapp.com/referral/redeem-arrow.png">
+              </a>
+            {% else %}
+                {% if not_redeemable %}
+                  <div class="alert alert-success" role="alert">
+                      <strong>{{ next_redeem_details }}</strong>
+                  </div>
+                {% else %}
+                <a class="btn btn-outline-secondary disabled w-100 font-weight-bold" href="#" style="background-color:#E0E1E1;color:black;border:none;" onclick="">
+                  {{ redeem_button.text }}
+                  <img src="https://media.getlokalapp.com/referral/redeem-arrow.png">
+                </a>
+              {% endif %}
+            {% endif %}
+            {% if not_redeemable %}
+            <div class="row text-left">
+              <div class="col-1 ml-2"><img height="20px" widht="20px" src="https://media.getlokalapp.com/referral/ic-info.png"></div>
+                <div class="col" style="color:#66676B">{{ next_redeem_notice }}</div>
+              </div>
+            {% endif %}
+            {% if redeem_status == "processing" %}
+            <div class="row">
+              <div class="col-1 ml-2"><img height="20px" widht="20px" src="https://media.getlokalapp.com/referral/ic-info.png"></div>
+              <div class="col">{% trans "The last reward transfer is in progress. It will be executed within the next 24 hours." %}</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <div style="margin-top:20px;">
+      <div class="font-normal">
+        <div class="font-bold-title mb-2" style="font-size:1.2rem">{% trans "Friends who signed up to Lokal" %} ({{ total_referrals }})</div>
+          {% for referred in referred_users %}
+          <div class="card referral-card mt-2 mb-2 p-3 w-100 font-normal" style="margin-top:20px;">
+            <div class="row" style="line-height:160%;" id="user-details{{forloop.counter}}"  data-toggle="collapse" href="#task-list{{referred.referee_id}}" role="button" aria-expanded="false" aria-controls="#task-list{{referred.referee_id}}">
+              <div class="col-2">
+                <div class="border font-weight-bold border-danger text-white bg-danger align-items-center text-center" style="font-size:1.8rem;border-radius:50%;height:40px;width:40px;">
+                  <div class="mt-2">{{ referred.name.0|capfirst }}</div>
+                </div>
+              </div>
+              <div class="col-8 ml-2">
+                <div class="row font-bold-title" id="username{{referred.referee_id}}">{{ referred.name }}</div>
+                <div class="row">{{ referred.mobile_no }}</div>
+                <div class="row font-bold-title text-success" style="font-size:0.8rem">{% trans "Your total reward = " %} {{ referred.total_reward }}</div>
+              </div>
+              <div class="col"><img id="collapse-arrow{{referred.referee_id}}" height="8" src="https://media.getlokalapp.com/referral/down-arrow.png"></div>
+            </div>
+            <div class="border border-bottom-0 border-left-0 border-right-0 collapse multi-collapse mt-2" id="task-list{{referred.referee_id}}">
+              {% for task in referred.tasks_completed %}
+                {% if task.is_done %}
+                <div class="row p-1">
+                  <div class="col-7">{{ task.title }}</div>
+                  <div class="col-3 text-success">₹{{ task.reward }}</div>
+                  <div class="col-2"><img src="https://media.getlokalapp.com/referral/check-circle.png"></div>
+                </div>
+                {% else %}
+                <div class="row p-1">
+                  <div class="col-10 text-muted">{{ task.title }}</div>
+                  <div class="col-2 text-muted">₹{{ task.reward }}</div>
+                </div>
+                {% endif %}
+              {% endfor %}
+              {% if referred.deeplink and referred.tasks_completed|length > 1%}
+              <div>
+                <div>
+                  {% if remind_button.is_active %}
+                  <a class="btn btn-outline-primary text-primary font-bold-title w-100 mb-1 mt-1" style="color:#0B6FC1;border-color:#0B6FC1;" href="#" onclick="remindFriend('{{ referred.deeplink }}', '{{ referred.share_text }}', '{{ referred.referee_id }}')">
+                    {%trans "Remind your friend" %}
+                    <img src="https://media.getlokalapp.com/referral/blue-arrow.png">
+                  </a>
+                  {% else %}
+                  <a class="btn btn-outline-primary font-bold-title w-100 mb-1 mt-1" style="color:#0B6FC1;border-color:#0B6FC1;" href="#" onclick="remindFriend('{{ referred.deeplink }}', '{{ referred.share_text }}', '{{ referred.referee_id }}')">
+                    {%trans "Remind your friend" %}
+                    <img src="https://media.getlokalapp.com/referral/blue-arrow.png">
+                  </a>
+                  {% endif %}
+                </div>
+                {{ referred.pending_reward_text }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+          {% if total_pages|length > 1 %}
+            <p class="paginator" style="text-align:center;font-size:larger;">
+              {% if 1 != current_page %}
+                <a href="#" onclick="Android.clickReload('relations/referral_progress/?page={{current_page|add:'-1'}}')"  style="margin:5px" class="btn btn-warning"> << </a>
+              {% endif %}
+              Page {{ current_page }}  of {{ total_pages|length }}
+              {% if total_pages|length != current_page %}
+                <a href="#" onclick="Android.clickReload('relations/referral_progress/?page={{current_page|add:'+1'}}')"  style="margin:5px" class="btn btn-warning"> >> </a>
+              {% endif %}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block customjs %}
+<script type="text/javascript">
+    if ('{{ is_campaign_changed }}' == 'True'){
+      $('#success-modal').modal('show');
+    }
+    referral_sign_ups_count = {{ total_referrals }}
+    document.addEventListener("DOMContentLoaded", function() {
+      $("#task-list"+{{referred_users.0.referee_id}}).addClass('show')
+      $("#collapse-arrow"+{{referred_users.0.referee_id}}).attr("src","https://media.getlokalapp.com/referral/up-arrow.png");
+      dataJson = JSON.stringify({"page": "invites_winning_page", "referral_code": '{{ referral_code }}', "total_reward":'{{ total_earnings }}', "reward_received_to_bank": '{{ redeemed_earnings }}', "referral_sign_ups_count": 'referral_sign_ups_count'});
+      Android.logAnalyticsEvent("referral", "screen_view", "viewed_screen_referral", dataJson);
+    });
+    $(document).on("click", "#redeem_button", function(){
+       $("#redeem_button").addClass('disabled');
+       if ('{{ is_auth }}' == 'True' && '{{ redeem_amount }}') {
+           $.ajax({
+              method: "POST",
+              url: "/relations/redeem_reward/",
+              data: {'amount': '{{ redeem_amount }}'},
+              timeout: 4000,
+              headers: {
+                'Authorization': 'Token {{ user_token }}',
+              }
+           }).done(function(data, status){
+              Android.openExternalPage(data);
+           }).fail(function(xhr, status, error){
+              alert('failed')
+           })
+       } else {
+           Android.clickLogin();
+       }
+       dataJson = JSON.stringify({"referral_code": '{{ referral_code }}', "total_reward":'{{ total_earnings }}', "reward_received_to_bank": '{{ redeemed_earnings }}', "referral_sign_ups_count": '{{ total_referrals }}'});
+       Android.logAnalyticsEvent("referral", "tap", "tap_redeem", dataJson);
+    });
+
+   function remindFriend(url, text, user_id){
+      Android.clickShare(url, text);
+      dataJson = JSON.stringify({"referrered_user": user_id, "referral_sign_ups_count": referral_sign_ups_count});
+      Android.logAnalyticsEvent("referral", "tap", "tap_remind_referral", dataJson);
+   }
+
+    {% for referred in referred_users %}
+       $("#task-list"+'{{ referred.referee_id }}').on('shown.bs.collapse', function () {
+         $("#collapse-arrow"+'{{ referred.referee_id }}').attr("src","https://media.getlokalapp.com/referral/up-arrow.png");
+         dataJson = JSON.stringify({"referred_user": ($(this).attr('id')).substring(9), "contact_position": '{{forloop.counter}}'});
+         Android.logAnalyticsEvent("referral", "tap", "referral_contact_expanded", dataJson);
+      });
+      $("#task-list"+'{{ referred.referee_id }}').on('hidden.bs.collapse', function () {
+         $("#collapse-arrow"+'{{ referred.referee_id }}').attr("src","https://media.getlokalapp.com/referral/down-arrow.png");
+      });
+    {% endfor %}
+</script>
+{% endblock customjs %}

@@ -1,0 +1,39 @@
+{% extends 'basic.html' %}
+{% load static i18n compress %}
+{% load thumbnail %}
+
+{% block customcss %}
+<link href="https://fonts.googleapis.com/css?family=Ramabhadra" rel="stylesheet">
+{% endblock customcss %}
+
+{% block content %}
+<div style="margin-top:10px">
+  <div class="col-md-2 col-lg-3"></div>
+  <div class="col-sm-12 col-md-8 col-lg-6">
+    <div class="card text-center" style="padding-top:20px">
+      <img class="card-img-top" width="100" height="100" src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyODYuMDU0IDI4Ni4wNTQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDI4Ni4wNTQgMjg2LjA1NDsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI1MTJweCIgaGVpZ2h0PSI1MTJweCI+CjxnPgoJPHBhdGggc3R5bGU9ImZpbGw6I0UyNTc0QzsiIGQ9Ik0xNDMuMDI3LDBDNjQuMDQsMCwwLDY0LjA0LDAsMTQzLjAyN2MwLDc4Ljk5Niw2NC4wNCwxNDMuMDI3LDE0My4wMjcsMTQzLjAyNyAgIGM3OC45OTYsMCwxNDMuMDI3LTY0LjAyMiwxNDMuMDI3LTE0My4wMjdDMjg2LjA1NCw2NC4wNCwyMjIuMDIyLDAsMTQzLjAyNywweiBNMTQzLjAyNywyNTkuMjM2ICAgYy02NC4xODMsMC0xMTYuMjA5LTUyLjAyNi0xMTYuMjA5LTExNi4yMDlTNzguODQ0LDI2LjgxOCwxNDMuMDI3LDI2LjgxOHMxMTYuMjA5LDUyLjAyNiwxMTYuMjA5LDExNi4yMDkgICBTMjA3LjIxLDI1OS4yMzYsMTQzLjAyNywyNTkuMjM2eiBNMTQzLjAzNiw2Mi43MjZjLTEwLjI0NCwwLTE3Ljk5NSw1LjM0Ni0xNy45OTUsMTMuOTgxdjc5LjIwMWMwLDguNjQ0LDcuNzUsMTMuOTcyLDE3Ljk5NSwxMy45NzIgICBjOS45OTQsMCwxNy45OTUtNS41NTEsMTcuOTk1LTEzLjk3MlY3Ni43MDdDMTYxLjAzLDY4LjI3NywxNTMuMDMsNjIuNzI2LDE0My4wMzYsNjIuNzI2eiBNMTQzLjAzNiwxODcuNzIzICAgYy05Ljg0MiwwLTE3Ljg1Miw4LjAxLTE3Ljg1MiwxNy44NmMwLDkuODMzLDguMDEsMTcuODQzLDE3Ljg1MiwxNy44NDNzMTcuODQzLTguMDEsMTcuODQzLTE3Ljg0MyAgIEMxNjAuODc4LDE5NS43MzIsMTUyLjg3OCwxODcuNzIzLDE0My4wMzYsMTg3LjcyM3oiLz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K" />
+      <div class="card-body">
+        <h5 class="card-title telugu-bold-title">Sorry</h5>
+        <p class="card-text">
+          {{ error }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!--<div class="container-fluid">-->
+  <!--<div class="row">     &lt;!&ndash; needed for center align, adds a scroll &ndash;&gt;-->
+    <!--<div class="col-sm-2 col-md-3 col-lg-4"></div>-->
+    <!--<div class="col-xs-12 col-sm-8 col-md-6 col-lg-4">-->
+      <!--<div id="leaderboard-container" class="row">-->
+        <!--<img class="card-img-top" width="100" height="100" src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyODYuMDU0IDI4Ni4wNTQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDI4Ni4wNTQgMjg2LjA1NDsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI1MTJweCIgaGVpZ2h0PSI1MTJweCI+CjxnPgoJPHBhdGggc3R5bGU9ImZpbGw6I0UyNTc0QzsiIGQ9Ik0xNDMuMDI3LDBDNjQuMDQsMCwwLDY0LjA0LDAsMTQzLjAyN2MwLDc4Ljk5Niw2NC4wNCwxNDMuMDI3LDE0My4wMjcsMTQzLjAyNyAgIGM3OC45OTYsMCwxNDMuMDI3LTY0LjAyMiwxNDMuMDI3LTE0My4wMjdDMjg2LjA1NCw2NC4wNCwyMjIuMDIyLDAsMTQzLjAyNywweiBNMTQzLjAyNywyNTkuMjM2ICAgYy02NC4xODMsMC0xMTYuMjA5LTUyLjAyNi0xMTYuMjA5LTExNi4yMDlTNzguODQ0LDI2LjgxOCwxNDMuMDI3LDI2LjgxOHMxMTYuMjA5LDUyLjAyNiwxMTYuMjA5LDExNi4yMDkgICBTMjA3LjIxLDI1OS4yMzYsMTQzLjAyNywyNTkuMjM2eiBNMTQzLjAzNiw2Mi43MjZjLTEwLjI0NCwwLTE3Ljk5NSw1LjM0Ni0xNy45OTUsMTMuOTgxdjc5LjIwMWMwLDguNjQ0LDcuNzUsMTMuOTcyLDE3Ljk5NSwxMy45NzIgICBjOS45OTQsMCwxNy45OTUtNS41NTEsMTcuOTk1LTEzLjk3MlY3Ni43MDdDMTYxLjAzLDY4LjI3NywxNTMuMDMsNjIuNzI2LDE0My4wMzYsNjIuNzI2eiBNMTQzLjAzNiwxODcuNzIzICAgYy05Ljg0MiwwLTE3Ljg1Miw4LjAxLTE3Ljg1MiwxNy44NmMwLDkuODMzLDguMDEsMTcuODQzLDE3Ljg1MiwxNy44NDNzMTcuODQzLTguMDEsMTcuODQzLTE3Ljg0MyAgIEMxNjAuODc4LDE5NS43MzIsMTUyLjg3OCwxODcuNzIzLDE0My4wMzYsMTg3LjcyM3oiLz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K" />-->
+        <!--<div class="card-body">-->
+          <!--<h5 class="card-title telugu-bold-title">Sorry</h5>-->
+          <!--<p class="card-text">-->
+            <!--{{ error }}</p>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</div>-->
+<!--</div>-->
+{% endblock content %}
+

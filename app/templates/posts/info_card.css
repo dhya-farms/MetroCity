@@ -1,0 +1,7 @@
+<style>
+table { border-collapse: collapse; width:100%; font-family: 'Ramabhadra', 'Mallanna', sans-serif; font-size:14px}
+th { text-align: left}
+tr:not(:last-child) { border-bottom: 1.5px solid #ccc;}
+a { text-decoration: none; color: #1b7ad2}
+td, th { padding-bottom: 0.25em; padding-top: 0.25em}
+</style>

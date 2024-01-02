@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+  {% block customcss %}
+    {{ form.media.css }}
+  {% endblock %}
+
+{% block content %}
+  <div class="col-md-8">
+    <br/>
+    <h1>Send Notification</h1>
+    <form action="" method="post" enctype="multipart/form-data" class="post-form" id="notification_form">
+      {% csrf_token %}
+        {% comment %}
+        {{ form.as_p }}
+        {% endcomment %}
+
+        {% block form %}
+            {% crispy form %}
+        {% endblock %}
+      <input class="save btn btn-primary" type="submit" value="Submit" />
+      <label id="advance_option_validation" style="color: red;"></label>
+    </form>
+    <br/>
+    <script>
+      form = document.getElementById("notification_form");
+      form.onkeypress = function(e){
+         if (e.keyCode == 13){          // Prevent submitting the form on Enter
+             e.preventDefault();
+         }
+      }
+    </script>
+  </div>
+{% endblock %}
+
+  {% block customjs %}
+    {{ form.media.js }}
+  {% endblock %}
+

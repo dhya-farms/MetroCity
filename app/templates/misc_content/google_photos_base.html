@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md bg-warning">
+  <div class="container-fluid">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'misc_content:google_photos-home' %}">Photos Home<span class="sr-only">(current)</span></a>
+      </li>
+      {% if 'google_credentials' in request.session %}
+        {# Adding important links for backend users#}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'misc_content:google_photos-logout' %}">Logout</a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'misc_content:google_photos-login' %}" id="log-in-link">Login with Google</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+<br>
+  {% block google-photos-app %}
+  <!-- Add your content here -->
+  {% endblock %}
+{% endblock %}
+
+  {# comment #}
+  {% block customjs %}
+  <script type="text/javascript">
+      var hash = location.hash;
+      console.log(hash);
+      let params = new URLSearchParams(hash);
+      var token = params.get("access_token"); // "foo"
+      console.log(token);
+  </script>
+  {% endblock %}
+  {# endcomment #}

@@ -1,0 +1,192 @@
+<p>&nbsp;</p>
+<!-- <div> -->
+<style>
+
+    .slideshow-container {
+        width: 100%;
+        /*height: 92%;*/
+        position: relative;
+        margin: auto;
+        margin-bottom: 0.25em;
+        /*float:left; */
+    }
+
+    /*.dotdiv{
+        text-align: center;
+        height: 8%;
+    }
+    */
+    /*.mySlides {
+        display: none;
+        height:  400px;
+        border: solid 1px black;
+    }
+    /*
+    .mySlides img{
+        height: 100%;
+    }
+    */
+    .prev,
+    .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        margin-top: -22px;
+        padding: 16px;
+        /*color: #222428;*/
+        color: #FFBB00;
+        font-weight: bold;
+        font-size: 30px;
+        transition: .6s ease;
+        border-radius: 0 1px 1px 0
+    }
+
+    .next {
+        right: -2px;
+        border-radius: 3px 3px 3px 3px
+    }
+
+    .prev {
+        left: -2px;
+        border-radius: 3px 3px 3px 3px
+    }
+
+    /*.prev:hover,
+    .next:hover {
+        color: #f2f2f2;
+        background-color: rgba(0, 0, 0, 0.8)
+    }*/
+
+    .text {
+        color: #f2f2f2;
+        font-size: 15px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        background-color: #222428
+    }
+
+    .numbertext {
+        color: #f2f2f2;
+        font-size: 12px;
+        padding: 8px 12px;
+        position: absolute;
+        top: 0
+    }
+    /*
+    .dot {
+        cursor: pointer;
+        height: 15px;
+        width: 15px;
+        margin: 0 2px;
+        background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color .6s ease
+    }
+    */
+    .active:hover {
+        background-color: #717171
+    }
+
+    </style>
+
+<div class="slideshow-container">
+  <div class="slideshow-inner">
+    {% for url in urls %}
+      <div id="slide{{forloop.counter}}" class="mySlides fade">
+        <img style="width: 100%;" src={{url}} alt="Image 1" />
+      </div>
+      <a onclick="plusSlides(-1)" class="prev">&#10094;&#10094;</a>
+      <a onclick="plusSlides(1)" class="next">&#10095;&#10095;</a>
+    {% endfor %}
+  </div>
+</div>
+
+<p>
+<script type="text/javascript">
+        var time_limit = 2000;
+        let slides = [];
+        {% for url in urls %}
+          slides.push("slide{{forloop.counter}}");
+        {% endfor %}
+        var total_slides = slides.length;
+        var slot_duration = Math.ceil(60/total_slides);
+        var d = new Date();
+        var minutes = d.getMinutes();
+        var slideIndex = Math.ceil(minutes/slot_duration);
+
+        var myTimer;
+        var slideshowContainer;
+
+        window.addEventListener("load",function() {
+            showSlides(slideIndex);
+            myTimer = setInterval(function(){plusSlides(1)}, time_limit);
+
+            //COMMENT OUT THE LINE BELOW TO KEEP ARROWS PART OF MOUSEENTER PAUSE/RESUME
+            // slideshowContainer = document.getElementsByClassName('slideshow-inner')[0];
+
+            //UNCOMMENT OUT THE LINE BELOW TO KEEP ARROWS PART OF MOUSEENTER PAUSE/RESUME
+            slideshowContainer = document.getElementsByClassName('slideshow-container')[0];
+
+            slideshowContainer.addEventListener('mouseenter', pause)
+            slideshowContainer.addEventListener('mouseleave', resume)
+        })
+
+        // NEXT AND PREVIOUS CONTROL
+        function plusSlides(n){
+          clearInterval(myTimer);
+          if (n < 0){
+            showSlides(slideIndex -= 1);
+          } else {
+           showSlides(slideIndex += 1);
+          }
+
+          //COMMENT OUT THE LINES BELOW TO KEEP ARROWS PART OF MOUSEENTER PAUSE/RESUME
+
+          if (n === -1){
+            myTimer = setInterval(function(){plusSlides(n + 2)}, time_limit);
+          } else {
+            myTimer = setInterval(function(){plusSlides(n + 1)}, time_limit);
+          }
+        }
+
+        //Controls the current slide and resets interval if needed
+        function currentSlide(n){
+          clearInterval(myTimer);
+          myTimer = setInterval(function(){plusSlides(n + 1)}, time_limit);
+          showSlides(slideIndex = n);
+        }
+
+        function showSlides(n){
+          var i;
+          // var slides = document.getElementsByClassName("mySlides");
+          // var dots = document.getElementsByClassName("dot");
+          if (n > slides.length) {slideIndex = 1}
+          if (n < 1) {slideIndex = slides.length}
+          for (i = 0; i < slides.length; i++) {
+              document.getElementById(slides[i]).style.display = "none";
+          }
+          // for (i = 0; i < dots.length; i++) {
+          //     document.getElementById(dots[i]).className = document.getElementById(dots[i]).className.replace(" active", "");
+          // }
+          console.log(slides[slideIndex-1]);
+          document.getElementById(slides[slideIndex-1]).style.display = "block";
+          // document.getElementById(dots[slideIndex-1]).className += " active";
+        }
+
+        pause = () => {
+          clearInterval(myTimer);
+        }
+
+        resume = () =>{
+          clearInterval(myTimer);
+          myTimer = setInterval(function(){plusSlides(slideIndex)}, time_limit);
+        }
+    </script>
+</p>
+<!-- </div> -->
