@@ -18,7 +18,7 @@ source env/bin/activate
 export DEPLOYMENT_ENVIRONMENT="prod"
 
 # Install Python dependencies
-pip3 install -r requirements.txt
+pip3 install -r requirements/production.txt
 
 # Check if the logs directory exists and create it if it doesn't
 if [ -d "logs" ]
