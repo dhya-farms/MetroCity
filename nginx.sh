@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Delete the old Nginx configuration file, if it exists
-sudo rm -f /etc/nginx/sites-available/FARMS.conf
-sudo rm -f /etc/nginx/sites-enabled/FARMS.conf
+sudo rm -f /etc/nginx/sites-available/METRO.conf
+sudo rm -f /etc/nginx/sites-enabled/METRO.conf
 
 # Copy the new Nginx configuration file
-sudo cp FARMS.conf /etc/nginx/sites-available/FARMS.conf
+sudo cp METRO.conf /etc/nginx/sites-available/METRO.conf
 
 # Create a symbolic link for Nginx
-sudo ln -s /etc/nginx/sites-available/FARMS.conf /etc/nginx/sites-enabled/FARMS.conf
+sudo ln -s /etc/nginx/sites-available/METRO.conf /etc/nginx/sites-enabled/METRO.conf
 
 # Test the Nginx configuration for syntax errors
 if sudo nginx -t; then
