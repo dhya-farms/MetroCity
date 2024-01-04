@@ -3,7 +3,7 @@
 source env/bin/activate
 
 # Set environment variables here
-export ENV_PATH=".env.prod"
+export DEPLOYMENT_ENVIRONMENT="prod"
 
 cd /var/lib/jenkins/workspace/METRO/
 
