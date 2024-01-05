@@ -4,8 +4,6 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.views import ObtainJSONWebToken
-
-from app.api.mixins import ApiAuthMixin
 from app.authentication.services import auth_logout
 from app.users.selectors import user_get_login_data
 
@@ -60,7 +58,7 @@ class UserJwtLoginApi(ObtainJSONWebToken):
         return response
 
 
-class UserJwtLogoutApi(ApiAuthMixin, APIView):
+class UserJwtLogoutApi(APIView):
     def post(self, request):
         auth_logout(request.user)
 
@@ -72,7 +70,7 @@ class UserJwtLogoutApi(ApiAuthMixin, APIView):
         return response
 
 
-class UserMeApi(ApiAuthMixin, APIView):
+class UserMeApi(APIView):
     def get(self, request):
         data = user_get_login_data(user=request.user)
 

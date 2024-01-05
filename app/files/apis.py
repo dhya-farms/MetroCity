@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 
-from app.api.mixins import ApiAuthMixin
 from app.files.models import File
 from app.files.services import (
     FileDirectUploadService,
