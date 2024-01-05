@@ -7,8 +7,8 @@ from config.env import env_to_enum
 from app.files.enums import FileUploadStorage, FileUploadStrategy
 import environ
 
-DEPLOYMENT_ENVIRONMENT = os.environ.get("DEPLOYMENT_ENVIRONMENT")
-
+# DEPLOYMENT_ENVIRONMENT = os.environ.get("DEPLOYMENT_ENVIRONMENT")
+DEPLOYMENT_ENVIRONMENT = 'prod'
 if not DEPLOYMENT_ENVIRONMENT:
     raise Exception(
         "DEPLOYMENT_ENVIRONMENT is invalid. Please set ENV variable correctly."
