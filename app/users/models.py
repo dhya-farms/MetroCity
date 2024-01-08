@@ -15,16 +15,16 @@ class User(AbstractUser):
     username_validator = UnicodeUsernameValidator()
 
     name = models.CharField(max_length=255)
-    username = models.CharField(
-        _('username'),
-        max_length=150,
-        help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
-        error_messages={
-            'unique': _("A user with that username already exists."),
-        },
-        default=generate_random_username()
-    )
+    # username = models.CharField(
+    #     _('username'),
+    #     max_length=150,
+    #     help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+    #     validators=[username_validator],
+    #     error_messages={
+    #         'unique': _("A user with that username already exists."),
+    #     },
+    #     default=generate_random_username()
+    # )
     email = models.EmailField(_('email address'), unique=True)
     mobile_no = models.CharField(max_length=10, unique=True, validators=[
         RegexValidator(regex=r'^\d{10}$', message="Provide Proper 10 digit Phone Number")],
