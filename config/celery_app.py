@@ -12,6 +12,7 @@ app = Celery("app")
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
 app.config_from_object("django.conf:settings", namespace="CELERY")
+app.conf.broker_transport_options = {'visibility_timeout': 21600}  # Taken from lokalads
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
