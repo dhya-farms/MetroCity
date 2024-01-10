@@ -4,7 +4,7 @@ from app.files.apis import (
     FileDirectUploadFinishApi,
     FileDirectUploadLocalApi,
     FileDirectUploadStartApi,
-    FileStandardUploadApi, FileRetrieveApi,
+    FileStandardUploadApi, FileRetrieveApi, FileListApi,
 )
 
 # Depending on your case, you might want to exclude certain urls, based on the values of
@@ -18,6 +18,7 @@ urlpatterns = [
         include(
             (
                 [
+                    path('files/', FileListApi.as_view(), name='file-list'),
                     path("standard/", FileStandardUploadApi.as_view(), name="standard"),
                     path(
                         "direct/",
