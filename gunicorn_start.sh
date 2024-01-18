@@ -7,7 +7,7 @@ GROUP=root
 NUM_WORKERS=5
 DJANGO_SETTINGS_MODULE=config.settings.production
 DJANGO_WSGI_MODULE=config.wsgi
-SOCKFILE=/tmp/gunicorn_metro.sock
+SOCKFILE=/tmp/gunicorn.sock
 ACCESS_LOG=${DJANGODIR}/logs/django_server_stdout.log
 ERROR_LOG=${DJANGODIR}/logs/django_server_stderr.log
 
