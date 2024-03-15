@@ -1,34 +1,49 @@
-from django.contrib import admin, messages
-from django.core.exceptions import ValidationError
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from app.users.models import User, Customer
 
-from app.users.models import User
-from app.users.services import user_create
+
+class UserAdminCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'name', 'email', 'mobile_no', 'role', 'director')
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "is_superuser", "is_active", "created_at", "updated_at")
+class UserAdminChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'name', 'email', 'mobile_no', 'role', 'director', 'password')
 
-    search_fields = ("email",)
 
-    list_filter = ("is_active", "is_superuser")
-
+class UserAdmin(BaseUserAdmin):
+    form = UserAdminChangeForm
+    add_form = UserAdminCreationForm
+    list_display = ('id', 'name', 'username', 'email', 'mobile_no', 'role', 'created_at', 'updated_at', 'director')
+    search_fields = ('name', 'username', 'email', 'mobile_no')
+    list_filter = ('role', 'is_active', 'is_staff', 'is_superuser')
+    ordering = ('-created_at',)
     fieldsets = (
-        (None, {"fields": ("email",)}),
-        ("Booleans", {"fields": ("is_active", "is_superuser")}),
-        ("Timestamps", {"fields": ("created_at", "updated_at")}),
+        (None, {'fields': ('username', 'password')}),
+        (('Personal info'), {'fields': ('name', 'email', 'mobile_no', 'role', 'director')}),
+        (('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        (('Important dates'), {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'name', 'email', 'mobile_no', 'role', 'director', 'password1', 'password2'),
+        }),
     )
 
-    readonly_fields = (
-        "created_at",
-        "updated_at",
-    )
 
-    def save_model(self, request, obj, form, change):
-        if change:
-            return super().save_model(request, obj, form, change)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'mobile_no', 'email', 'occupation', 'created_at', 'updated_at')
+    search_fields = ('name', 'mobile_no', 'email')
+    list_filter = ('created_at', 'updated_at')
+    ordering = ('-created_at',)
 
-        try:
-            user_create(**form.cleaned_data)
-        except ValidationError as exc:
-            self.message_user(request, str(exc), messages.ERROR)
+
+# Register your models here.
+admin.site.register(User, UserAdmin)
+admin.site.register(Customer, CustomerAdmin)

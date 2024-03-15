@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from app.crm.views import CRMLeadViewSet, StatusChangeRequestViewSet, PaymentViewSet, SiteVisitViewSet
 from app.properties.views import PropertyViewSet, PlotViewSet, PhaseViewSet
-from app.users.views import UserViewSet, CustomerViewSet
+from app.users.views import UserViewSet, CustomerViewSet, OtpLoginViewSet
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -13,6 +13,7 @@ else:
     router = SimpleRouter()
 
 router.register("users", UserViewSet, basename="users")
+router.register("otp", OtpLoginViewSet, basename='otp')
 router.register("customers", CustomerViewSet, basename="customers")
 router.register("properties", PropertyViewSet, basename="properties")
 router.register("phases", PhaseViewSet, basename="phases")

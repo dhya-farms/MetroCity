@@ -48,6 +48,7 @@ class UserUpdateSchema(BaseModel):
 
 # User Listing Schema
 class UserListSchema(BaseModel):
+    username: Optional[str]
     name: Optional[str]
     email: Optional[str]
     mobile_no: Optional[str]
