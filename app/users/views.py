@@ -63,7 +63,8 @@ class OtpLoginViewSet(viewsets.ViewSet):
         else:
             name = user.name
         message = SMS.OTP_LOGIN_MESSAGE.format(name=name, otp=otp)
-        send_sms.delay(message=message, number=mobile_no)
+        send_sms_result = send_sms.delay(message=message, number=mobile_no)
+        print(send_sms_result.get(timeout=10))  # Waits up to 10 seconds for the result
         # send_sms.apply_async(
         #     kwargs={'mobile_no': mobile_no, 'message': message})
         return Response(data={"message": "otp generated"}, status=status.HTTP_200_OK)
