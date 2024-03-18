@@ -90,9 +90,14 @@ class OtpLoginViewSet(viewsets.ViewSet):
         mobile_no = str(mobile_no)
         otp = cache.get("otp_" + mobile_no)
         if otp:
+            user = User.objects.filter(mobile_no=mobile_no).first()
+            if user is None:
+                name = "User"
+            else:
+                name = user.name or "User"
             cache.set("otp_" + mobile_no, otp, timeout=300)
-            # message = GupshupSMSIntegration.OTP_SMS.replace("{otp}", str(otp))
-            # send_sms_to_user.delay(mobile_no=mobile_no, message=message)
+            message = SMS.OTP_LOGIN_MESSAGE.format(name=name, otp=otp)
+            send_sms.apply_async(args=[message, mobile_no], queue='openai')
             return Response(data={"message": "resent otp"}, status=status.HTTP_200_OK)
         else:
             return Response(data={"message": "OTP not sent or it is expired"}, status=status.HTTP_400_BAD_REQUEST)
