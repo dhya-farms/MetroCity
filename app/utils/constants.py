@@ -38,5 +38,5 @@ class CacheKeys(Enum):
 
 
 class SMS:
-    OTP_LOGIN = "otp-{otp}"
+    OTP_LOGIN_MESSAGE = "Dear {name},24HRS Application login {otp} - COSMOZEAL TECH LLP"
     TEXTLOCAL_HOST = "https://api.textlocal.in/send/?"

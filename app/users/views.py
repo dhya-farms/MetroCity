@@ -17,6 +17,8 @@ from app.users.schemas import UserCreateSchema, UserUpdateSchema, UserListSchema
 from app.users.serializers import UserSerializer, CustomerSerializer
 from app.users.controllers import UserController, CustomerController
 from rest_framework.pagination import PageNumberPagination
+
+from app.users.tasks import send_sms
 from app.utils.constants import Timeouts, CacheKeys, SMS
 from app.utils.helpers import qdict_to_dict, build_cache_key, mobile_number_validation_check, generate_random_username
 from app.utils.views import BaseViewSet
@@ -46,18 +48,23 @@ class OtpLoginViewSet(viewsets.ViewSet):
 
         mobile_no = str(mobile_no)
 
-        static_otp_mobile_numbers = ['9344015965', '8971165979', '7013991532', '9959727836', '1414141414',
-                                     '8858327030']  # can keep the numbers in .env file
-        if mobile_no in static_otp_mobile_numbers:
-            otp = "1111"
-        else:
-            otp = str(random.randint(1000, 9999))
-        if settings.DEBUG:
-            otp = "1111"
+        # static_otp_mobile_numbers = ['9344015965', '8971165979', '7013991532', '9959727836', '1414141414',
+        #                              '8858327030']  # can keep the numbers in .env file
+        # if mobile_no in static_otp_mobile_numbers:
+        #     otp = "1111"
+        # else:
+        otp = str(random.randint(1000, 9999))
+        # if settings.DEBUG:
+        #     otp = "1111"
         cache.set("otp_" + mobile_no, otp, timeout=300)
-        message = SMS.OTP_LOGIN.format(otp=otp)
-        # send_otp(mobile_no=mobile_no, message=message)
-        # send_otp.apply_async(
+        user = User.objects.filter(mobile_no=mobile_no).first()
+        if user is None:
+            name = "User"
+        else:
+            name = user.name
+        message = SMS.OTP_LOGIN_MESSAGE.format(name=name, otp=otp)
+        send_sms.delay(message=message, number=mobile_no)
+        # send_sms.apply_async(
         #     kwargs={'mobile_no': mobile_no, 'message': message})
         return Response(data={"message": "otp generated"}, status=status.HTTP_200_OK)
 

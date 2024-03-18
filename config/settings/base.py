@@ -401,3 +401,4 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+TEXT_LOCAL_API_KEY = env("TEXT_LOCAL_API_KEY")
