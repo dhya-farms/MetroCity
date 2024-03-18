@@ -12,7 +12,7 @@ def send_sms(message, number):
         "apikey": settings.TEXT_LOCAL_API_KEY,
         "numbers": number,
         "message": message,
-        "sender": "TXTLCL"  # Assume "TXTLCL" is your sender ID; adjust as necessary.
+        "sender": "HRSOFF"  # Assume "TXTLCL" is your sender ID; adjust as necessary.
     }).encode("utf-8")
     request = urllib.request.Request(SMS.TEXTLOCAL_HOST, data)
     with urllib.request.urlopen(request) as f:
