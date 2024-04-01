@@ -26,7 +26,7 @@ class User(AbstractUser):
         default=generate_random_username(),
         unique=True
     )
-    email = models.EmailField(_('email address'), unique=True)
+    email = models.EmailField(_('email address'), unique=True, blank=True, null=True)
     mobile_no = models.CharField(max_length=10, unique=True, validators=[
         RegexValidator(regex=r'^\d{10}$', message="Provide Proper 10 digit Phone Number")],
                                  db_index=True, blank=True, null=True)
