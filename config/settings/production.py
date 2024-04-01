@@ -1,6 +1,7 @@
 import logging
 
 import sentry_sdk
+from corsheaders.defaults import default_headers
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
@@ -15,10 +16,42 @@ from .base import env
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["dhya.in"])
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["52.59.211.140"])
+# CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["52.59.211.140"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["http://52.59.211.140"])
+
+# try
+## CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8081",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://splashchemicals.in",
+    "https://www.splashchemicals.in"
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-csrftoken",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 USE_X_FORWARDED_HOST = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", False)
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False)
+
+# try ends
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -42,11 +75,11 @@ CACHES = {
 # SECURITY
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # # https://docs.djangoproject.com/en/dev/ref/settings/#secure-ssl-redirect
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=False)
-CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", False)
-SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False)
+# CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", False)
+# SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False)
 # # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
 # # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
 # # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
@@ -123,7 +156,6 @@ INSTALLED_APPS += ["anymail"]  # noqa: F405
 # https://anymail.readthedocs.io/en/stable/esps
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 ANYMAIL = {}
-
 
 # LOGGING
 # ------------------------------------------------------------------------------
