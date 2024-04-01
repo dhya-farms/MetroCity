@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 from app.crm.views import CRMLeadViewSet, StatusChangeRequestViewSet, PaymentViewSet, SiteVisitViewSet
 from app.properties.views import PropertyViewSet, PlotViewSet, PhaseViewSet
 from app.users.views import UserViewSet, CustomerViewSet, OtpLoginViewSet
+from app.utils.views import get_enum_values
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -27,7 +28,7 @@ app_name = "api"
 urlpatterns = router.urls
 
 urlpatterns += [
-    # path('get-enum-values/', get_enum_values, name='get_enum_values'),
+    path('get-enum-values/', get_enum_values, name='get_enum_values'),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='api:schema'), name='swagger-ui'),
     path('schema/redoc/', SpectacularRedocView.as_view(url_name='api:schema'), name='redoc'),

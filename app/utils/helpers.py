@@ -3,31 +3,50 @@ import uuid
 from decimal import Decimal
 from urllib import request, parse
 from django.conf import settings
+from django.utils import translation
+
+from app.crm.enums import PropertyStatus, PaymentStatus, PaymentFor, DocumentStatus, PaymentMode, ApprovalStatus
+from app.files.enums import FileUploadStrategy, FileUsageType, CRMDocumentType, FileUploadStorage
+from app.properties.enums import Availability, PhaseStatus, PropertyType, AreaOfPurpose, AreaSizeUnit, Facing, SoilType
+from app.users.enums import Role
 from app.utils.constants import CacheKeys, SMS
 from app.utils.serializers import EnumValueSerializer
 
 
-# def get_data_for_field(field, locale):
-#     mapping = {
-#         'Designation': Designation,
-#         'WeightUnit': WeightUnit,
-#         'RecordType': RecordType,
-#         'PlaceType': PlaceType,
-#         'PayType': PayType,
-#
-#     }
-#     translation.activate(locale)
-#     enum_class = mapping.get(field)
-#     data = EnumValueSerializer(enum_class.choices, many=True, context={'field': field, 'enum_class': enum_class}).data
-#     data = {
-#         "display_data": {
-#             "name": field,
-#             "name_vernacular": field,
-#         },
-#         "values": data
-#     }
-#     translation.deactivate()
-#     return data
+def get_data_for_field(field, locale):
+    mapping = {
+        'PropertyStatus': PropertyStatus,
+        'PaymentMode': PaymentMode,
+        'PaymentStatus': PaymentStatus,
+        'PaymentFor': PaymentFor,
+        'DocumentStatus': DocumentStatus,
+        'ApprovalStatus': ApprovalStatus,
+        # 'FileUploadStrategy': FileUploadStrategy,
+        # 'FileUploadStorage': FileUploadStorage,
+        'FileUsageType': FileUsageType,
+        'CRMDocumentType': CRMDocumentType,
+        'Availability': Availability,
+        'PhaseStatus': PhaseStatus,
+        'PropertyType': PropertyType,
+        'AreaOfPurpose': AreaOfPurpose,
+        'AreaSizeUnit': AreaSizeUnit,
+        'Facing': Facing,
+        'SoilType': SoilType,
+        'Role': Role,
+    }
+
+    translation.activate(locale)
+    enum_class = mapping.get(field)
+    data = EnumValueSerializer(enum_class.choices, many=True, context={'field': field, 'enum_class': enum_class}).data
+    data = {
+        "display_data": {
+            "name": field,
+            "name_vernacular": field,
+        },
+        "values": data
+    }
+    translation.deactivate()
+    return data
 
 
 def allow_string_rep_of_enum(x):

@@ -1,10 +1,53 @@
 from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, authentication_classes, permission_classes
 from app.utils.constants import Timeouts
-from app.utils.helpers import build_cache_key, qdict_to_dict
+from app.utils.helpers import build_cache_key, qdict_to_dict, get_data_for_field
 from app.utils.pagination import MyPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_enum_values(request):
+    # TODO Not the best way. Think for a better solution.
+
+    """
+        Serves GET requests given on the entity API root path which provide all enums values
+        GET /api/get-enum-values
+        :param request:
+        :return:
+    """
+
+    locale = request.LANGUAGE_CODE
+    fields = (
+        'PropertyStatus',
+        'PaymentMode',
+        'PaymentStatus',
+        'PaymentFor',
+        'DocumentStatus',
+        'ApprovalStatus',
+        # 'FileUploadStrategy',
+        # 'FileUploadStorage',
+        'FileUsageType',
+        'CRMDocumentType',
+        'Availability',
+        'PhaseStatus',
+        'PropertyType',
+        'AreaOfPurpose',
+        'AreaSizeUnit',
+        'Facing',
+        'SoilType',
+        'Role',
+    )
+
+    data = {}
+    for field in fields:
+        data[field] = get_data_for_field(field=field, locale=locale)
+    return JsonResponse(data=data, status=status.HTTP_200_OK)
 
 
 class BaseViewSet(viewsets.ViewSet):
