@@ -51,11 +51,11 @@ class OtpLoginViewSet(viewsets.ViewSet):
         # static_otp_mobile_numbers = ['9344015965', '8971165979', '7013991532', '9959727836', '1414141414',
         #                              '8858327030']  # can keep the numbers in .env file
         # if mobile_no in static_otp_mobile_numbers:
-        #     otp = "1111"
+        #     otp = "111111"
         # else:
-        otp = str(random.randint(1000, 9999))
+        otp = str(random.randint(100000, 999999))
         # if settings.DEBUG:
-        #     otp = "1111"
+        #     otp = "111111"
         cache.set("otp_" + mobile_no, otp, timeout=300)
         user = User.objects.filter(mobile_no=mobile_no).first()
         if user is None:
