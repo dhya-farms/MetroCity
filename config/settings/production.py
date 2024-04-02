@@ -26,7 +26,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://splashchemicals.in",
-    "https://www.splashchemicals.in"
+    "https://www.splashchemicals.in",
+    "splashchemicals.in",
+    "www.splashchemicals.in"
 ]
 
 CORS_ALLOW_METHODS = [
@@ -41,6 +43,8 @@ CORS_ALLOW_METHODS = [
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "x-csrftoken",
 ]
+
+# CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 

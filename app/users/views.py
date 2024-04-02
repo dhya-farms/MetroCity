@@ -54,8 +54,8 @@ class OtpLoginViewSet(viewsets.ViewSet):
         #     otp = "111111"
         # else:
         otp = str(random.randint(100000, 999999))
-        # if settings.DEBUG:
-        #     otp = "111111"
+        if settings.DEBUG:
+            otp = "111111"
         cache.set("otp_" + mobile_no, otp, timeout=300)
         user = User.objects.filter(mobile_no=mobile_no).first()
         if user is None:
