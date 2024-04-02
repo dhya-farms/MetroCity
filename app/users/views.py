@@ -66,7 +66,8 @@ class OtpLoginViewSet(viewsets.ViewSet):
         # send_sms_result = send_sms(message=message, number=mobile_no)
         # print(send_sms_result)
         # send_sms_result = send_sms.delay(message=message, number=mobile_no)
-        send_sms.apply_async(args=[message, mobile_no], queue='openai')
+        # send_sms.apply_async(args=[message, mobile_no], queue='openai')
+        send_sms(message, mobile_no)
         # print(send_sms_result.get(timeout=10))  # Waits up to 10 seconds for the result
 
         # send_sms.apply_async(
