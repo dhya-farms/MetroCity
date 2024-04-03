@@ -274,9 +274,6 @@ class CustomerViewSet(BaseViewSet):
             return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
         try:
             with transaction.atomic():
-                errors, instance = self.controller.create(**data.dict())
-                if errors:
-                    return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
                 user = User.objects.create(
                     username=generate_random_username(),
                     name=data.name,
@@ -284,6 +281,12 @@ class CustomerViewSet(BaseViewSet):
                     mobile_no=data.mobile_no,
                     role=Role.CUSTOMER,
                 )
+                token, created = Token.objects.get_or_create(user=user)
+                user.auth_token = token
+                user.save()
+                errors, instance = self.controller.create(**data.dict(), user=user)
+                if errors:
+                    return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
                 return JsonResponse(data={"customer_id": instance.pk, "user_id": user.pk}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(str(e))
