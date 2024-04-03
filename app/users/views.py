@@ -2,6 +2,7 @@ import random
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
+from django.db import transaction
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from rest_framework import viewsets, status
@@ -12,6 +13,7 @@ from django.core.cache import cache
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework.response import Response
 
+from app.users.enums import Role
 from app.users.schemas import UserCreateSchema, UserUpdateSchema, UserListSchema, CustomerCreateSchema, \
     CustomerUpdateSchema, CustomerListSchema
 from app.users.serializers import UserSerializer, CustomerSerializer
@@ -265,7 +267,27 @@ class CustomerViewSet(BaseViewSet):
         ]
     )
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        # return super().create(request, *args, **kwargs)
+
+        errors, data = self.controller.parse_request(self.create_schema, request.data)
+        if errors:
+            return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            with transaction.atomic():
+                errors, instance = self.controller.create(**data.dict())
+                if errors:
+                    return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
+                user = User.objects.create(
+                    username=generate_random_username(),
+                    name=data.name,
+                    email=data.email,
+                    mobile_no=data.mobile_no,
+                    role=Role.CUSTOMER,
+                )
+                return JsonResponse(data={"customer_id": instance.pk, "user_id": user.pk}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(str(e))
+            return JsonResponse({'error': 'An error occurred. Please try again.'}, status=500)
 
     @extend_schema(
         description="Retrieve a specific customer by id",
