@@ -1,4 +1,5 @@
 from _decimal import Decimal
+from django.contrib.auth import get_user_model
 from pydantic.v1 import BaseModel, validator, condecimal, constr
 from typing import Optional, List
 from datetime import datetime
@@ -6,9 +7,10 @@ from datetime import datetime
 from app.properties.enums import Facing, SoilType
 from app.properties.enums import PropertyType, AreaSizeUnit, AreaOfPurpose, PhaseStatus
 from app.properties.enums import Availability
+from app.users.models import Customer
 from app.utils.helpers import allow_string_rep_of_enum, convert_to_decimal
 
-
+User = get_user_model()
 # Property Creation Schema
 class PropertyCreateSchema(BaseModel):
     property_type: PropertyType
@@ -88,6 +90,17 @@ class PropertyListSchema(BaseModel):
                 return datetime.strptime(v, '%Y-%m-%dT%H:%M:%SZ')
             except ValueError as e:
                 raise ValueError(f"Start time format is incorrect: {e}")
+        return v
+
+    @validator('current_lead_id', pre=True, allow_reuse=True)
+    def convert_customer_id(cls, v):
+        if v:
+            user_instance = User.objects.get(id=int(v))
+            try:
+                customer_id = user_instance.customer.id  # Accessing the related Customer instance and its ID
+            except Customer.DoesNotExist:
+                customer_id = None  # In case the User instance has no related Customer
+            return customer_id
         return v
 
     @validator('end_time', pre=True, allow_reuse=True)

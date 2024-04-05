@@ -26,8 +26,8 @@ class Property(models.Model):
                                    on_delete=models.CASCADE)
     director = models.ForeignKey(User, related_name='directed_properties', on_delete=models.CASCADE,
                                  blank=True, null=True)
-    current_lead = models.OneToOneField("users.Customer", on_delete=models.CASCADE, blank=True, null=True,
-                                        related_name="property")
+    current_lead = models.ForeignKey("users.Customer", on_delete=models.CASCADE, blank=True, null=True,
+                                     related_name="property")
 
 
 class Phase(models.Model):
