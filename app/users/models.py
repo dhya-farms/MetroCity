@@ -59,3 +59,6 @@ class Customer(models.Model):
     # {"area_of_purpose": [1, 2], "property_types": [1, 3]}
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"id: {self.id}. {self.name} [{self.mobile_no}]"
