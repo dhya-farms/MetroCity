@@ -1,6 +1,6 @@
 from _decimal import Decimal
-from pydantic.v1 import BaseModel, validator, condecimal
-from typing import Optional
+from pydantic.v1 import BaseModel, validator, condecimal, constr
+from typing import Optional, List
 from datetime import datetime
 
 from app.properties.enums import Facing, SoilType
@@ -12,11 +12,15 @@ from app.utils.helpers import allow_string_rep_of_enum, convert_to_decimal
 # Property Creation Schema
 class PropertyCreateSchema(BaseModel):
     property_type: PropertyType
+    plots_available: Optional[int]
+    sq_ft_from: Optional[str]
+    description: Optional[str]
     area_of_purpose: AreaOfPurpose
     name: str
     dtcp_details: Optional[str]
     price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
-    amenities: Optional[str]
+    amenities: List[constr(strip_whitespace=True, min_length=1)] = []
+    nearby_attractions: List[constr(strip_whitespace=True, min_length=1)] = []
     location: Optional[str]
     phase_number: Optional[int]
     created_by_id: Optional[int]
@@ -39,11 +43,15 @@ class PropertyCreateSchema(BaseModel):
 # Property Creation Schema
 class PropertyUpdateSchema(BaseModel):
     property_type: PropertyType
+    plots_available: Optional[int]
+    sq_ft_from: Optional[str]
+    description: Optional[str]
     area_of_purpose: AreaOfPurpose
     name: str
     dtcp_details: Optional[str]
     price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
-    amenities: Optional[str]
+    amenities: List[constr(strip_whitespace=True, min_length=1)] = []
+    nearby_attractions: List[constr(strip_whitespace=True, min_length=1)] = []
     location: Optional[str]
     phase_number: Optional[int]
     created_by_id: Optional[int]
@@ -53,6 +61,7 @@ class PropertyUpdateSchema(BaseModel):
     _validate_price = validator('price',
                                 allow_reuse=True,
                                 pre=True)(convert_to_decimal)
+
     _validate_property_type = validator('property_type',
                                         allow_reuse=True,
                                         pre=True)(allow_string_rep_of_enum)
@@ -67,6 +76,8 @@ class PropertyListSchema(BaseModel):
     property_type: Optional[PropertyType]
     area_of_purpose: Optional[AreaOfPurpose]
     phase_number: Optional[int]
+    director_id: Optional[int]
+    current_lead_id: Optional[int]
     start_time: Optional[datetime]
     end_time: Optional[datetime]
 

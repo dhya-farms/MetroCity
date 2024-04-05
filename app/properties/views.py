@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 
@@ -25,15 +27,24 @@ class PropertyViewSet(BaseViewSet):
         examples=[
             OpenApiExample('Property Creation Request JSON', value={
                 "property_type": 1,
+                "plots_available": 2,
+                "sq_ft_from": "200",
+                "description": "desc",
                 "area_of_purpose": 1,
                 "name": "Green Acres",
                 "dtcp_details": "DTCP Approved",
                 "price": 100000.00,
-                "amenities": "Swimming pool, Gym",
+                "amenities": [
+                    "pool",
+                    "Gym"
+                ],
+                "nearby_attractions": [
+                    "Lake"
+                ],
                 "location": "Downtown",
                 "phase_number": 1,
-                "created_by_id": 1,
-                "director_id": 2,
+                "created_by_id": 16,
+                "director_id": 16,
                 "current_lead_id": 3
             })
         ]
@@ -48,16 +59,25 @@ class PropertyViewSet(BaseViewSet):
         examples=[
             OpenApiExample('Property Update Request JSON', value={
                 "property_type": 1,
+                "plots_available": 2,
+                "sq_ft_from": "200",
+                "description": "desc",
                 "area_of_purpose": 1,
-                "name": "Blue Lagoon",
-                "dtcp_details": "Not applicable",
-                "price": 150000.00,
-                "amenities": "Parking lot, Security",
-                "location": "Uptown",
-                "phase_number": 2,
-                "created_by_id": 2,
-                "director_id": 1,
-                "current_lead_id": 4
+                "name": "Green Acres",
+                "dtcp_details": "DTCP Approved",
+                "price": 100000.00,
+                "amenities": [
+                    "pool",
+                    "Gym"
+                ],
+                "nearby_attractions": [
+                    "Lake"
+                ],
+                "location": "Downtown",
+                "phase_number": 1,
+                "created_by_id": 16,
+                "director_id": 109,
+                "current_lead_id": 3
             })
         ]
     )
@@ -70,6 +90,10 @@ class PropertyViewSet(BaseViewSet):
             OpenApiParameter(name='property_type', type=int),
             OpenApiParameter(name='area_of_purpose', type=int),
             OpenApiParameter(name='phase_number', type=int),
+            OpenApiParameter(name='director_id', type=int),
+            OpenApiParameter(name='current_lead_id', type=int),
+            OpenApiParameter(name='start_time', type=datetime),
+            OpenApiParameter(name='end_time', type=datetime),
         ],
         responses={200: PropertySerializer(many=True)}
     )
