@@ -258,11 +258,12 @@ class CustomerViewSet(BaseViewSet):
         responses={201: CustomerSerializer},
         examples=[
             OpenApiExample('Customer Creation Request JSON', value={
-                "name": "John Doe",
-                "email": "john@example.com",
-                "mobile_number": "1234567890",
+                "name": "Siva Prakash",
+                "email": "siva0109228@gmail.com",
+                "mobile_no": "9344015566",
                 "occupation": "Developer",
-                "preferences": {"area_of_purpose": [1, 2], "property_types": [1, 3]}
+                "address": "16 a VSA LANE",
+                "preferences": {"area_of_purpose": [1, 2], "property_types": [1, 3], "budget": 100000}
             })
         ]
     )
@@ -309,11 +310,12 @@ class CustomerViewSet(BaseViewSet):
         responses={200: CustomerSerializer},
         examples=[
             OpenApiExample('Customer Update Request JSON', value={
-                "name": "Jane Doe",
-                "email": "jane@example.com",
-                "mobile_number": "0987654321",
-                "occupation": "Manager",
-                "preferences": {"area_of_purpose": [3, 4], "property_types": [2, 5]}
+                "name": "Siva Prakash",
+                "email": "siva0109228@gmail.com",
+                "mobile_no": "9344015566",
+                "occupation": "Developer",
+                "address": "16 a VSA LANE",
+                "preferences": {"area_of_purpose": [1, 2], "property_types": [1, 3], "budget": 100000}
             })
         ]
     )
@@ -324,6 +326,7 @@ class CustomerViewSet(BaseViewSet):
         description="List and filter customers",
         responses={200: CustomerSerializer(many=True)},
         parameters=[
+            OpenApiParameter(name='user_id', type=int),
             OpenApiParameter(name='name', type=str),
             OpenApiParameter(name='email', type=str),
             OpenApiParameter(name='mobile_number', type=str),

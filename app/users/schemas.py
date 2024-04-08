@@ -94,6 +94,7 @@ class CustomerUpdateSchema(BaseModel):
 
 # Customer Listing Schema
 class CustomerListSchema(BaseModel):
+    user_id: Optional[int]
     name: Optional[str]
     email: Optional[str]
     mobile_no: Optional[str]
