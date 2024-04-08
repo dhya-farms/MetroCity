@@ -67,10 +67,11 @@ class UserListSchema(BaseModel):
 # Customer Creation Schema
 class CustomerCreateSchema(BaseModel):
     name: str
-    email: str
+    email: Optional[str]
     mobile_no: str
     occupation: str
-    preferences: dict
+    address: str
+    preferences: Optional[dict]
     # validator to trim  display number
     _validate_mobile_no = validator('mobile_no',
                                     allow_reuse=True,
@@ -80,10 +81,11 @@ class CustomerCreateSchema(BaseModel):
 # Customer Update Schema
 class CustomerUpdateSchema(BaseModel):
     name: str
-    email: str
+    email: Optional[str]
     mobile_no: str
     occupation: str
-    preferences: dict
+    address: str
+    preferences: Optional[dict]
     # validator to trim  display number
     _validate_mobile_no = validator('mobile_no',
                                     allow_reuse=True,

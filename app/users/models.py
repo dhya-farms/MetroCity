@@ -57,6 +57,7 @@ class Customer(models.Model):
     occupation = models.CharField(max_length=255, blank=True, null=True)
     preferences = JSONField(blank=True, null=True)
     # {"area_of_purpose": [1, 2], "property_types": [1, 3]}
+    address = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
