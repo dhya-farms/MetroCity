@@ -2,6 +2,7 @@ import random
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
@@ -320,6 +321,11 @@ class CustomerViewSet(BaseViewSet):
         ]
     )
     def partial_update(self, request, pk, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=pk)
+            pk = user.customer.id
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
         return super().partial_update(request, pk, *args, **kwargs)
 
     @extend_schema(
