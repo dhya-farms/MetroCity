@@ -82,7 +82,7 @@ class CustomerCreateSchema(BaseModel):
 class CustomerUpdateSchema(BaseModel):
     name: str
     email: Optional[str]
-    mobile_no: str
+    mobile_no: Optional[str]
     occupation: str
     address: str
     preferences: Optional[dict]
