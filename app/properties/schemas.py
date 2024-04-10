@@ -92,16 +92,16 @@ class PropertyListSchema(BaseModel):
                 raise ValueError(f"Start time format is incorrect: {e}")
         return v
 
-    @validator('current_lead_id', pre=True, allow_reuse=True)
-    def convert_customer_id(cls, v):
-        if v:
-            user_instance = User.objects.get(id=int(v))
-            try:
-                customer_id = user_instance.customer.id  # Accessing the related Customer instance and its ID
-            except Customer.DoesNotExist:
-                customer_id = None  # In case the User instance has no related Customer
-            return customer_id
-        return v
+    # @validator('current_lead_id', pre=True, allow_reuse=True)
+    # def convert_customer_id(cls, v):
+    #     if v:
+    #         user_instance = User.objects.get(id=int(v))
+    #         try:
+    #             customer_id = user_instance.customer.id  # Accessing the related Customer instance and its ID
+    #         except Customer.DoesNotExist:
+    #             customer_id = None  # In case the User instance has no related Customer
+    #         return customer_id
+    #     return v
 
     @validator('end_time', pre=True, allow_reuse=True)
     def validate_estimated_completion_date(cls, v):
