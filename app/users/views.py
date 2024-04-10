@@ -146,6 +146,7 @@ class OtpLoginViewSet(viewsets.ViewSet):
             response = Response(data={
                 "message": "successfully logged in",
                 "user": UserSerializer(user).data,
+                "customer": CustomerSerializer(user.customer).data if user.customer else None,
                 "token": auth_token.key},
                 status=status.HTTP_200_OK)
             return response
@@ -321,11 +322,11 @@ class CustomerViewSet(BaseViewSet):
         ]
     )
     def partial_update(self, request, pk, *args, **kwargs):
-        try:
-            user = User.objects.get(pk=pk)
-            pk = user.customer.id
-        except ObjectDoesNotExist:
-            return JsonResponse({'error': 'User not found'}, status=404)
+        # try:
+        #     user = User.objects.get(pk=pk)
+        #     pk = user.customer.id
+        # except ObjectDoesNotExist:
+        #     return JsonResponse({'error': 'User not found'}, status=404)
         return super().partial_update(request, pk, *args, **kwargs)
 
     @extend_schema(
