@@ -1,15 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from app.users.models import User, Customer
-from django.utils.translation import ugettext_lazy as _
 
 
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('name', 'email', 'mobile_no', 'role', 'director')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        ('Personal info', {'fields': ('name', 'email', 'mobile_no', 'role', 'director')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     readonly_fields = ('last_login', 'date_joined', 'created_at', 'updated_at')  # Add automatic fields here
     add_fieldsets = (
@@ -17,7 +16,7 @@ class UserAdmin(BaseUserAdmin):
             'classes': ('wide',),
             'fields': ('username', 'password1', 'password2'),
         }),
-        (_('Personal info'), {'fields': ('name', 'email', 'mobile_no', 'role', 'director')}),
+        ('Personal info', {'fields': ('name', 'email', 'mobile_no', 'role', 'director')}),
     )
     list_display = ('id', 'username', 'email', 'name', 'mobile_no', 'is_staff', 'created_at')
     search_fields = ('username', 'name', 'email', 'mobile_no')
