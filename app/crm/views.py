@@ -30,11 +30,18 @@ class CRMLeadViewSet(BaseViewSet):
         responses={201: CRMLeadSerializer},
         examples=[
             OpenApiExample('CRM Lead Creation Request JSON', value={
-                "plot_id": 1,
+                "property_id": 1,
                 "customer_id": 2,
                 "assigned_so": 3,
-                "initial_contact_date": "2023-01-01T00:00:00Z",
-                "current_status": "interested"
+                "details": {
+                    "property_name": "",
+                    "property_type": 1,
+                    "phase_no": 1,
+                    "plot_no": 2,
+                    "sq_ft": 2000,
+                    "is_corner": True
+                },
+                "current_status": 1
             })
         ]
     )
@@ -47,11 +54,18 @@ class CRMLeadViewSet(BaseViewSet):
         responses={200: CRMLeadSerializer},
         examples=[
             OpenApiExample('CRM Lead Update Request JSON', value={
-                "plot_id": 1,
-                "customer_id": 4,
-                "assigned_so": 5,
-                "initial_contact_date": "2023-01-02T00:00:00Z",
-                "current_status": "negotiation"
+                "property_id": 1,
+                "customer_id": 2,
+                "assigned_so": 3,
+                "details": {
+                    "property_name": "",
+                    "property_type": 1,
+                    "phase_no": 1,
+                    "plot_no": 2,
+                    "sq_ft": 2000,
+                    "is_corner": True
+                },
+                "current_status": 1
             })
         ]
     )
@@ -61,10 +75,10 @@ class CRMLeadViewSet(BaseViewSet):
     @extend_schema(
         description="List and filter CRM leads",
         parameters=[
-            OpenApiParameter(name='plot_id', type=int),
+            OpenApiParameter(name='property_id', type=int),
             OpenApiParameter(name='customer_id', type=int),
-            OpenApiParameter(name='assigned_so', type=int),
-            OpenApiParameter(name='current_status', type=str),
+            OpenApiParameter(name='assigned_so_id', type=int),
+            OpenApiParameter(name='current_status', type=int),
         ],
         responses={200: CRMLeadSerializer(many=True)}
     )
@@ -115,8 +129,8 @@ class StatusChangeRequestViewSet(BaseViewSet):
                 "approved_by_id": 3,
                 "requested_status": 1,
                 "approval_status": 1,
-                "date_requested": "2023-01-01T00:00:00Z",
-                "date_approved_rejected": "2023-01-02T00:00:00Z"
+                "date_approved": "2023-01-01T00:00:00Z",
+                "date_rejected": "2023-01-01T00:00:00Z",
             })
         ]
     )
@@ -130,12 +144,12 @@ class StatusChangeRequestViewSet(BaseViewSet):
         examples=[
             OpenApiExample('Status Change Request Update JSON', value={
                 "crm_lead_id": 1,
-                "requested_by_id": 4,
-                "approved_by_id": 5,
+                "requested_by_id": 2,
+                "approved_by_id": 3,
                 "requested_status": 1,
                 "approval_status": 1,
-                "date_requested": "2023-01-03T00:00:00Z",
-                "date_approved_rejected": "2023-01-04T00:00:00Z"
+                "date_approved": "2023-01-01T00:00:00Z",
+                "date_rejected": "2023-01-01T00:00:00Z",
             })
         ]
     )

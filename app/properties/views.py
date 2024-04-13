@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from django.http import JsonResponse
+from rest_framework import status
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 
@@ -8,6 +10,7 @@ from app.properties.schemas import PropertyUpdateSchema, PropertyCreateSchema, P
     PhaseUpdateSchema, PhaseListSchema, PlotCreateSchema, PlotUpdateSchema, PlotListSchema
 from app.properties.serializers import PropertySerializer, PhaseSerializer, PlotSerializer
 from app.utils.constants import CacheKeys
+from app.utils.pagination import CustomPageNumberPagination
 from app.utils.views import BaseViewSet
 
 
@@ -25,60 +28,64 @@ class PropertyViewSet(BaseViewSet):
         request=PropertyCreateSchema,
         responses={201: PropertySerializer},
         examples=[
-            OpenApiExample('Property Creation Request JSON', value={
+            OpenApiExample('Property Creation Request JSON', value=
+            {
                 "property_type": 1,
-                "plots_available": 2,
-                "sq_ft_from": "200",
-                "description": "desc",
+                "description": "Luxurious community plots available with full amenities.",
                 "area_of_purpose": 1,
-                "name": "Green Acres",
-                "dtcp_details": "DTCP Approved",
-                "price": 100000.00,
-                "amenities": [
-                    "pool",
-                    "Gym"
-                ],
-                "nearby_attractions": [
-                    "Lake"
-                ],
-                "location": "Downtown",
-                "phase_number": 1,
-                "created_by_id": 16,
-                "director_id": 16,
-                "current_lead_id": 3
-            })
+                "name": "Sunset Vistas",
+                "price": 250000.00,
+                "details": {
+                    "plots_available": 20,
+                    "sq_ft_from": "1500",
+                    "dtcp_details": "Approved for construction",
+                    "amenities": ["Community Pool", "Jogging Track"],
+                    "nearby_attractions": ["Lake View", "Shopping Mall"]
+                },
+                "location": "Downtown Riverside",
+                "gmap_url": "https://maps.google.com/maps?q=123+Main+St+Cityville",
+                "director_id": 101,
+                "current_lead_id": 205
+            }
+                           )
         ]
     )
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        errors, data = self.controller.parse_request(self.create_schema, request.data)
+        if errors:
+            return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
+
+        errors, instance = self.controller.create(**data.dict(), created_by=request.user)
+        if errors:
+            return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return JsonResponse(data={"id": instance.pk}, status=status.HTTP_201_CREATED)
 
     @extend_schema(
         description="Partially update an existing property",
         request=PropertyUpdateSchema,
         responses={200: PropertySerializer},
         examples=[
-            OpenApiExample('Property Update Request JSON', value={
+            OpenApiExample('Property Update Request JSON', value=
+            {
                 "property_type": 1,
-                "plots_available": 2,
-                "sq_ft_from": "200",
-                "description": "desc",
+                "description": "Luxurious community plots available with full amenities.",
                 "area_of_purpose": 1,
-                "name": "Green Acres",
-                "dtcp_details": "DTCP Approved",
-                "price": 100000.00,
-                "amenities": [
-                    "pool",
-                    "Gym"
-                ],
-                "nearby_attractions": [
-                    "Lake"
-                ],
-                "location": "Downtown",
-                "phase_number": 1,
-                "created_by_id": 16,
-                "director_id": 109,
-                "current_lead_id": 3
-            })
+                "name": "Sunset Vistas",
+                "price": 250000.00,
+                "details": {
+                    "plots_available": 20,
+                    "sq_ft_from": "1500",
+                    "dtcp_details": "Approved for construction",
+                    "amenities": ["Community Pool", "Jogging Track"],
+                    "nearby_attractions": ["Lake View", "Shopping Mall"]
+                },
+                "location": "Downtown Riverside",
+                "gmap_url": "https://maps.google.com/maps?q=123+Main+St+Cityville",
+                "director_id": 101,
+                "current_lead_id": 205
+            }
+            )
         ]
     )
     def partial_update(self, request, pk, *args, **kwargs):
@@ -89,7 +96,7 @@ class PropertyViewSet(BaseViewSet):
         parameters=[
             OpenApiParameter(name='property_type', type=int),
             OpenApiParameter(name='area_of_purpose', type=int),
-            OpenApiParameter(name='phase_number', type=int),
+            OpenApiParameter(name='created_by_id', type=int),
             OpenApiParameter(name='director_id', type=int),
             OpenApiParameter(name='current_lead_id', type=int),
             OpenApiParameter(name='start_time', type=datetime),
@@ -198,6 +205,36 @@ class PhaseViewSet(BaseViewSet):
     @action(methods=['POST'], detail=True)
     def make_inactive(self, request, pk, *args, **kwargs):
         return super().make_inactive(request, pk, *args, **kwargs)
+
+    @action(detail=True, methods=['post'], url_path='add-to-favorites')
+    def add_to_favorites(self, request, pk=None):
+        customer = request.user.customer
+        property = self.controller.get_instance_by_pk(pk=pk)
+        if not property:
+            return JsonResponse({"error": "Property with this ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        customer.favorites.add(property)
+        return JsonResponse({'status': 'property added to favorites'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='remove-from-favorites')
+    def remove_from_favorites(self, request, pk=None):
+        customer = request.user.customer
+        property = self.controller.get_instance_by_pk(pk=pk)
+        if not property:
+            return JsonResponse({"error": "Property with this ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        customer.favorites.remove(property)
+        return JsonResponse({'status': 'property removed from favorites'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='my-favourites')
+    def list_favorites(self, request):
+        paginator = CustomPageNumberPagination()
+        customer = request.user.customer
+        queryset = customer.favorites.all()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        if page is not None:
+            res = self.controller.serialize_queryset(page, self.serializer)
+            return paginator.get_paginated_response(res)
+        res = self.controller.serialize_queryset(queryset, self.serializer)
+        return JsonResponse(res, safe=False, status=status.HTTP_200_OK)
 
 
 class PlotViewSet(BaseViewSet):

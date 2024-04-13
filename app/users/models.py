@@ -50,6 +50,7 @@ class User(AbstractUser):
 
 class Customer(models.Model):
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, blank=True, null=True)
+    favorites = models.ManyToManyField('properties.Property', related_name='favorited_by', blank=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='customers/profile_images/', blank=True, null=True)
     mobile_no = models.CharField(max_length=20, blank=True, null=True)
@@ -58,6 +59,8 @@ class Customer(models.Model):
     preferences = JSONField(blank=True, null=True)
     # {"area_of_purpose": [1, 2], "property_types": [1, 3]}
     address = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name='created_customers',
+                                   blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

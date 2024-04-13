@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, authentication_classes, permission_classes
 from app.utils.constants import Timeouts
 from app.utils.helpers import build_cache_key, qdict_to_dict, get_data_for_field
-from app.utils.pagination import MyPagination
+from app.utils.pagination import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
@@ -90,18 +90,21 @@ class BaseViewSet(viewsets.ViewSet):
         if errors:
             return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
 
-        paginator = MyPagination()
+        paginator = CustomPageNumberPagination()
         page_key = request.query_params.get('page')
-        cache_key = build_cache_key(
-            self.cache_key_list,
-            page=page_key,
-            **data.dict()
-        )
-        instance = cache.get(cache_key)
-        instance = None
+        instance, cache_key = None, ""
+        if self.cache_key_list.value:
+            cache_key = build_cache_key(
+                self.cache_key_list,
+                page=page_key,
+                **data.dict()
+            )
+            instance = cache.get(cache_key)
+
         if instance:
             res = instance
         else:
+            a = data.dict()
             errors, data = self.controller.filter(**data.dict())
             if errors:
                 return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
@@ -109,7 +112,8 @@ class BaseViewSet(viewsets.ViewSet):
             page = paginator.paginate_queryset(queryset, request, view=self)
             if page is not None:
                 res = self.controller.serialize_queryset(page, self.serializer)
-                cache.set(cache_key, res, timeout=Timeouts.MINUTES_10)
+                if self.cache_key_list.value:
+                    cache.set(cache_key, res, timeout=Timeouts.MINUTES_10)
                 return paginator.get_paginated_response(res)
             res = self.controller.serialize_queryset(queryset, self.serializer)
 

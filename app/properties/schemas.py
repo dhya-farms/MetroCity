@@ -1,7 +1,9 @@
+import json
+
 from _decimal import Decimal
 from django.contrib.auth import get_user_model
-from pydantic.v1 import BaseModel, validator, condecimal, constr
-from typing import Optional, List
+from pydantic.v1 import BaseModel, validator, condecimal, constr, Field, HttpUrl
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 from app.properties.enums import Facing, SoilType
@@ -11,23 +13,31 @@ from app.users.models import Customer
 from app.utils.helpers import allow_string_rep_of_enum, convert_to_decimal
 
 User = get_user_model()
+
+
 # Property Creation Schema
 class PropertyCreateSchema(BaseModel):
     property_type: PropertyType
-    plots_available: Optional[int]
-    sq_ft_from: Optional[str]
     description: Optional[str]
     area_of_purpose: AreaOfPurpose
     name: str
-    dtcp_details: Optional[str]
     price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
-    amenities: List[constr(strip_whitespace=True, min_length=1)] = []
-    nearby_attractions: List[constr(strip_whitespace=True, min_length=1)] = []
+    details: Optional[Dict[str, Any]] = Field(default_factory=dict)
     location: Optional[str]
-    phase_number: Optional[int]
-    created_by_id: Optional[int]
+    gmap_url: Optional[HttpUrl] = None
     director_id: Optional[int]
     current_lead_id: Optional[int]
+
+    @validator('details', pre=True)
+    def parse_details(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                raise ValueError('Invalid JSON format')
+        elif not isinstance(v, dict):
+            raise TypeError('Details must be a dictionary or a JSON string.')
+        return v
 
     _validate_price = validator('price',
                                 allow_reuse=True,
@@ -43,41 +53,15 @@ class PropertyCreateSchema(BaseModel):
 
 
 # Property Creation Schema
-class PropertyUpdateSchema(BaseModel):
-    property_type: PropertyType
-    plots_available: Optional[int]
-    sq_ft_from: Optional[str]
-    description: Optional[str]
-    area_of_purpose: AreaOfPurpose
-    name: str
-    dtcp_details: Optional[str]
-    price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
-    amenities: List[constr(strip_whitespace=True, min_length=1)] = []
-    nearby_attractions: List[constr(strip_whitespace=True, min_length=1)] = []
-    location: Optional[str]
-    phase_number: Optional[int]
-    created_by_id: Optional[int]
-    director_id: Optional[int]
-    current_lead_id: Optional[int]
-
-    _validate_price = validator('price',
-                                allow_reuse=True,
-                                pre=True)(convert_to_decimal)
-
-    _validate_property_type = validator('property_type',
-                                        allow_reuse=True,
-                                        pre=True)(allow_string_rep_of_enum)
-
-    _validate_area_of_purpose = validator('area_of_purpose',
-                                          allow_reuse=True,
-                                          pre=True)(allow_string_rep_of_enum)
+class PropertyUpdateSchema(PropertyCreateSchema):
+    pass
 
 
 # Property Listing Schema
 class PropertyListSchema(BaseModel):
     property_type: Optional[PropertyType]
     area_of_purpose: Optional[AreaOfPurpose]
-    phase_number: Optional[int]
+    created_by_id: Optional[int]
     director_id: Optional[int]
     current_lead_id: Optional[int]
     start_time: Optional[datetime]

@@ -2,28 +2,25 @@ import random
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 from django.db import transaction
+from django.http import JsonResponse
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from django.http import JsonResponse
-from django.core.cache import cache
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework.response import Response
 
+from app.users.controllers import UserController, CustomerController
 from app.users.enums import Role
 from app.users.schemas import UserCreateSchema, UserUpdateSchema, UserListSchema, CustomerCreateSchema, \
     CustomerUpdateSchema, CustomerListSchema
 from app.users.serializers import UserSerializer, CustomerSerializer
-from app.users.controllers import UserController, CustomerController
-from rest_framework.pagination import PageNumberPagination
-
 from app.users.tasks import send_sms
-from app.utils.constants import Timeouts, CacheKeys, SMS
-from app.utils.helpers import qdict_to_dict, build_cache_key, mobile_number_validation_check, generate_random_username
+from app.utils.constants import CacheKeys, SMS
+from app.utils.helpers import mobile_number_validation_check, generate_random_username
 from app.utils.views import BaseViewSet
 
 User = get_user_model()
@@ -287,7 +284,7 @@ class CustomerViewSet(BaseViewSet):
                 token, created = Token.objects.get_or_create(user=user)
                 user.auth_token = token
                 user.save()
-                errors, instance = self.controller.create(**data.dict(), user=user)
+                errors, instance = self.controller.create(**data.dict(), user=user, created_by=request.user)
                 if errors:
                     return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
                 return JsonResponse(data={"customer_id": instance.pk, "user_id": user.pk}, status=status.HTTP_201_CREATED)
@@ -337,6 +334,7 @@ class CustomerViewSet(BaseViewSet):
             OpenApiParameter(name='name', type=str),
             OpenApiParameter(name='email', type=str),
             OpenApiParameter(name='mobile_number', type=str),
+            OpenApiParameter(name='created_by', type=int),
         ]
     )
     def list(self, request, **kwargs):

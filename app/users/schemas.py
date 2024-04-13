@@ -98,6 +98,7 @@ class CustomerListSchema(BaseModel):
     name: Optional[str]
     email: Optional[str]
     mobile_no: Optional[str]
+    created_by_id: Optional[int]
     # validator to trim  display number
     _validate_mobile_no = validator('mobile_no',
                                     allow_reuse=True,

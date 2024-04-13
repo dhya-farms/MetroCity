@@ -11,15 +11,29 @@ class PropertyStatus(models.IntegerChoices):
 
 
 class PaymentMode(models.IntegerChoices):
-    GPAY = 1, 'Gpay'
-    PAYTM = 2, 'PayTm'
-    # Add more payment modes here if needed
+    ONLINE = 1, 'Online'
+    CASH = 2, 'Cash'
+
+
+class PaymentMethod(models.IntegerChoices):
+    CREDIT_CARD = 1, 'Credit Card'
+    DEBIT_CARD = 2, 'Debit Card'
+    NET_BANKING = 3, 'Net Banking'
+    UPI = 4, 'UPI'
+    RAZORPAY = 5, 'Razorpay'
 
 
 class PaymentStatus(models.IntegerChoices):
-    FULL = 1, 'Full'
-    PARTIAL = 2, 'Partial'
-    # Add more status options here if needed
+    PENDING = 1, 'Pending'
+    COMPLETED = 2, 'Completed'
+    FAILED = 3, 'Failed'
+
+
+class RazorpayWebhookEventType(models.IntegerChoices):
+    PAYMENT_CAPTURED = 1, 'Payment Captured'
+    PAYMENT_FAILED = 2, 'Payment Failed'
+    REFUND_INITIATED = 3, 'Refund Initiated'
+    REFUND_FAILED = 4, 'Refund Failed'
 
 
 class PaymentFor(models.IntegerChoices):
