@@ -3,6 +3,7 @@ import random
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.http import JsonResponse
 from django.utils import timezone
@@ -133,17 +134,27 @@ class OtpLoginViewSet(viewsets.ViewSet):
             if user is None:
                 user = User.objects.create(username=generate_random_username())
                 user.mobile_no = mobile_no
-                token, created = Token.objects.get_or_create(user=user)
-                user.auth_token = token
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             print(request.user)
             user.last_login = timezone.now()
+
+            # Attempt to access the user's auth_token
+            try:
+                auth_token = user.auth_token
+            except ObjectDoesNotExist:
+                auth_token, created = Token.objects.get_or_create(user=user)
+                user.auth_token = auth_token
             user.save()
-            auth_token = user.auth_token
+
+            # Attempt to access the user's customer
+            try:
+                customer = user.customer
+            except ObjectDoesNotExist:
+                customer = None
             response = Response(data={
                 "message": "successfully logged in",
                 "user": UserSerializer(user).data,
-                "customer": CustomerSerializer(user.customer).data if user.customer else None,
+                "customer": CustomerSerializer(customer).data if customer else None,
                 "token": auth_token.key},
                 status=status.HTTP_200_OK)
             return response
