@@ -298,7 +298,8 @@ class CustomerViewSet(BaseViewSet):
                 errors, instance = self.controller.create(**data.dict(), user=user, created_by=request.user)
                 if errors:
                     return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
-                return JsonResponse(data={"customer_id": instance.pk, "user_id": user.pk}, status=status.HTTP_201_CREATED)
+                return JsonResponse(data={"customer_id": instance.pk, "user_id": user.pk},
+                                    status=status.HTTP_201_CREATED)
         except Exception as e:
             print(str(e))
             return JsonResponse({'error': 'An error occurred. Please try again.'}, status=500)
@@ -329,13 +330,16 @@ class CustomerViewSet(BaseViewSet):
             })
         ]
     )
+    @transaction.atomic
     def partial_update(self, request, pk, *args, **kwargs):
-        # try:
-        #     user = User.objects.get(pk=pk)
-        #     pk = user.customer.id
-        # except ObjectDoesNotExist:
-        #     return JsonResponse({'error': 'User not found'}, status=404)
-        return super().partial_update(request, pk, *args, **kwargs)
+        response = super().partial_update(request, pk, *args, **kwargs)
+        try:
+            customer = self.controller.get_instance_by_pk(pk)
+            UserController().edit(customer.user.id, name=customer.name, email=customer.email,
+                                  mobile_no=customer.mobile_no)
+            return response
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'Customer not found'}, status=404)
 
     @extend_schema(
         description="List and filter customers",
