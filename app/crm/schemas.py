@@ -32,9 +32,6 @@ class CRMLeadCreateSchema(BaseModel):
 
 # CRMLead Update Schema
 class CRMLeadUpdateSchema(BaseModel):
-    property_id: int
-    customer_id: int
-    assigned_so_id: int
     details: Optional[Dict[str, Any]] = Field(default_factory=dict)
     current_status: Optional[PropertyStatus]
 
