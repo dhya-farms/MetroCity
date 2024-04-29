@@ -302,7 +302,7 @@ class CustomerViewSet(BaseViewSet):
                                     status=status.HTTP_201_CREATED)
         except Exception as e:
             print(str(e))
-            return JsonResponse({'error': 'An error occurred. Please try again.'}, status=500)
+            return JsonResponse({'error': str(e)}, status=500)
 
     @extend_schema(
         description="Retrieve a specific customer by id",
