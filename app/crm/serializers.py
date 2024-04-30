@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from app.crm.enums import PropertyStatus
+from app.crm.enums import PropertyStatus, ApprovalStatus
 from app.crm.models import CRMLead, StatusChangeRequest, LeadStatusLog, SalesOfficerPerformance, Payment, SiteVisit
 from app.properties.serializers import PlotSerializer, PropertySerializer
 from app.users.serializers import CustomerSerializer, UserSerializer
@@ -37,7 +37,7 @@ class StatusChangeRequestSerializer(serializers.ModelSerializer):
 
     def get_approval_status(self, obj: StatusChangeRequest):
         if obj.approval_status:
-            return get_serialized_enum(PropertyStatus(obj.approval_status))
+            return get_serialized_enum(ApprovalStatus(obj.approval_status))
         return dict()
 
     class Meta:

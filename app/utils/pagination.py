@@ -19,7 +19,7 @@ class CustomPageNumberPagination(PageNumberPagination):
         # If all items are being returned, don't include pagination details
         if getattr(self, 'return_all', False):
             return Response(OrderedDict([
-                ('count', 1000),
+                ('count', len(data)),
                 ('next', ''),
                 ('previous', ''),
                 ('page_size', self.page_size),

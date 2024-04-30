@@ -241,6 +241,7 @@ class PlotUpdateSchema(BaseModel):
     area_size: int
     area_size_unit: AreaSizeUnit
     availability: Optional[Availability]
+    is_sold: Optional[bool]
 
     # Validator to allow string version of enum value too
     _validate_availability = validator('availability',
@@ -264,6 +265,7 @@ class PlotListSchema(BaseModel):
     availability: Optional[Availability]
     facing: Optional[Facing]
     soil_type: Optional[SoilType]
+    is_sold: Optional[bool]
 
     # Validator to allow string version of enum value too
     _validate_availability = validator('availability',

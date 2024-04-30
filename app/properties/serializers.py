@@ -52,16 +52,15 @@ class PropertySerializer(serializers.ModelSerializer):
 
 
 class PhaseSerializer(serializers.ModelSerializer):
-    property = PropertySerializer()
-
     class Meta:
         model = Phase
-        fields = '__all__'  # List all fields or specify fields
+        fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status']
 
 
 class PlotSerializer(serializers.ModelSerializer):
-    phase = PhaseSerializer()
+    phase_details = PhaseSerializer(source='phase', read_only=True)
+    property_details = PropertySerializer(source='phase.property', read_only=True)  # Nested property details via phase
 
     class Meta:
         model = Plot
-        fields = '__all__'  # List all fields or specify fields
+        fields = ['id', 'plot_number', 'is_corner_site', 'dimensions', 'facing', 'soil_type', 'plantation', 'price', 'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_sold', 'phase_details', 'property_details']

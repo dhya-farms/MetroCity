@@ -61,8 +61,11 @@ class Phase(models.Model):
     description = models.TextField(blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
     estimated_completion_date = models.DateTimeField(blank=True, null=True)
-    status = models.IntegerField(choices=PhaseStatus.choices, blank=True,
+    status = models.IntegerField(choices=PhaseStatus.choices, default=PhaseStatus.NOT_COMPLETED, blank=True,
                                  null=True)
+
+    def __str__(self):
+        return f"Phase - {self.phase_number} -- {self.property.name} Image"
 
 
 class Plot(models.Model):
@@ -79,3 +82,7 @@ class Plot(models.Model):
     availability = models.IntegerField(choices=Availability.choices, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_sold = models.BooleanField(default=False, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.phase.property.name} Phase - {self.phase.phase_number} Plot - {self.plot_number}"

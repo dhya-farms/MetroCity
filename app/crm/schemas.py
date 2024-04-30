@@ -76,20 +76,11 @@ class StatusChangeRequestCreateSchema(BaseModel):
 
 # StatusChangeRequest Update Schema
 class StatusChangeRequestUpdateSchema(BaseModel):
-    crm_lead_id: int
-    requested_by_id: int
     approved_by_id: Optional[int]
-    requested_status: PropertyStatus
     approval_status: Optional[ApprovalStatus]
-    date_approved: Optional[datetime]
-    date_rejected: Optional[datetime]
-
-    @validator('date_approved', 'date_rejected', pre=True, allow_reuse=True)
-    def validate_date_approved_rejected(cls, v):
-        return parse_datetime(v)
 
     # Validator to allow string version of enum value too
-    _validate_enums = validator('approval_status', 'requested_status',
+    _validate_enums = validator('approval_status',
                                 allow_reuse=True,
                                 pre=True)(allow_string_rep_of_enum)
 
