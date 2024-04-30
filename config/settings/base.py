@@ -386,7 +386,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': (
         'rest_framework.pagination.PageNumberPagination',
     ),
-    "PAGE_SIZE": 1,
+    "PAGE_SIZE": 5,
 }
 
 # # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
