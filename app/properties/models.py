@@ -13,7 +13,6 @@ class Property(models.Model):
     description = models.TextField(blank=True, null=True)
     area_of_purpose = models.IntegerField(choices=AreaOfPurpose.choices, null=True, blank=True)
     name = models.CharField(max_length=255, blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     details = JSONField(blank=True, null=True)  # Store type-specific details
     location = models.TextField(blank=True, null=True)
     gmap_url = models.URLField(max_length=200, blank=True, null=True)
@@ -71,7 +70,7 @@ class Phase(models.Model):
 class Plot(models.Model):
     phase = models.ForeignKey("properties.Phase", on_delete=models.CASCADE, blank=True, null=True, related_name="plots")
     plot_number = models.IntegerField(blank=True, null=True)
-    is_corner_site = models.BooleanField(blank=True, null=True)
+    is_corner_site = models.BooleanField(default=False, blank=True, null=True)
     dimensions = models.CharField(max_length=45, blank=True, null=True)
     facing = models.IntegerField(choices=Facing.choices, blank=True, null=True)
     soil_type = models.IntegerField(choices=SoilType.choices, blank=True, null=True)

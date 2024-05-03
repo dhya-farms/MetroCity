@@ -19,6 +19,8 @@ def parse_datetime(v):
 # CRMLead Creation Schema
 class CRMLeadCreateSchema(BaseModel):
     property_id: int
+    phase_id: int
+    plot_id: Optional[int]
     customer_id: int
     assigned_so_id: int
     details: Optional[Dict[str, Any]] = Field(default_factory=dict)
@@ -32,6 +34,8 @@ class CRMLeadCreateSchema(BaseModel):
 
 # CRMLead Update Schema
 class CRMLeadUpdateSchema(BaseModel):
+    phase_id: Optional[int]
+    plot_id: Optional[int]
     details: Optional[Dict[str, Any]] = Field(default_factory=dict)
     current_status: Optional[PropertyStatus]
 
@@ -44,6 +48,8 @@ class CRMLeadUpdateSchema(BaseModel):
 # CRMLead Listing Schema
 class CRMLeadListSchema(BaseModel):
     property_id: Optional[int]
+    phase_id: Optional[int]
+    plot_id: Optional[int]
     customer_id: Optional[int]
     assigned_so_id: Optional[int]
     current_status: Optional[PropertyStatus]

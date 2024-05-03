@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParamete
 from app.properties.controllers import PropertyController, PhaseController, PlotController
 from app.properties.schemas import PropertyUpdateSchema, PropertyCreateSchema, PropertyListSchema, PhaseCreateSchema, \
     PhaseUpdateSchema, PhaseListSchema, PlotCreateSchema, PlotUpdateSchema, PlotListSchema
-from app.properties.serializers import PropertySerializer, PhaseSerializer, PlotSerializer
+from app.properties.serializers import PropertySerializer, PhaseSerializer, PlotSerializer, PlotSerializerSimple
 from app.utils.constants import CacheKeys
 from app.utils.pagination import CustomPageNumberPagination
 from app.utils.views import BaseViewSet
@@ -239,7 +239,7 @@ class PhaseViewSet(BaseViewSet):
 
 class PlotViewSet(BaseViewSet):
     controller = PlotController()
-    serializer = PlotSerializer
+    serializer = PlotSerializerSimple
     create_schema = PlotCreateSchema
     update_schema = PlotUpdateSchema
     list_schema = PlotListSchema

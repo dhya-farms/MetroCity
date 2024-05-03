@@ -10,6 +10,8 @@ User = get_user_model()
 
 class CRMLead(models.Model):
     property = models.ForeignKey("properties.Property", on_delete=models.CASCADE)
+    phase = models.ForeignKey("properties.Phase", on_delete=models.CASCADE, blank=True, null=True)
+    plot = models.ForeignKey("properties.Plot", on_delete=models.CASCADE, blank=True, null=True)
     customer = models.ForeignKey("users.Customer", on_delete=models.CASCADE)
     assigned_so = models.ForeignKey(User, related_name='assigned_crm_leads', on_delete=models.CASCADE, blank=True, null=True)
     details = JSONField(blank=True, null=True)  # Store type-specific details

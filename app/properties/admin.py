@@ -20,13 +20,13 @@ class PlotInline(admin.TabularInline):
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'property_type', 'price', 'location', 'created_at', 'updated_at']
-    list_filter = ['property_type', 'area_of_purpose', 'created_at', 'updated_at', 'price']
+    list_display = ['id', 'name', 'property_type', 'location', 'created_at', 'updated_at']
+    list_filter = ['property_type', 'area_of_purpose', 'created_at', 'updated_at']
     search_fields = ['name', 'description', 'location', 'details']
     inlines = [PropertyImageInline, PhaseInline]
     readonly_fields = ['created_at', 'updated_at']  # Fields that should be read-only in the admin interface
     fieldsets = (
-        (None, {'fields': ('name', 'description', 'details', 'price')}),
+        (None, {'fields': ('name', 'description', 'details')}),
         ('Location Details', {'fields': ('location', 'gmap_url')}),
         ('Classification', {'fields': ('property_type', 'area_of_purpose')}),
         ('Administrative', {'fields': ('created_by', 'director', 'current_lead', 'created_at', 'updated_at')}),

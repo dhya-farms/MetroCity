@@ -2,13 +2,15 @@ from rest_framework import serializers
 
 from app.crm.enums import PropertyStatus, ApprovalStatus
 from app.crm.models import CRMLead, StatusChangeRequest, LeadStatusLog, SalesOfficerPerformance, Payment, SiteVisit
-from app.properties.serializers import PlotSerializer, PropertySerializer
+from app.properties.serializers import PlotSerializer, PropertySerializer, PhaseSerializer, PlotSerializerSimple
 from app.users.serializers import CustomerSerializer, UserSerializer
 from app.utils.helpers import get_serialized_enum
 
 
 class CRMLeadSerializer(serializers.ModelSerializer):
     property = PropertySerializer()
+    phase = PhaseSerializer()
+    plot = PlotSerializerSimple
     customer = CustomerSerializer()
     assigned_so = UserSerializer()
     current_status = serializers.SerializerMethodField()

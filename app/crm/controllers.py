@@ -19,9 +19,11 @@ class StatusChangeRequestController(Controller):
 
     def edit(self, instance_id, **kwargs):
         try:
-            instance = self.model.objects.get(id=instance_id)
+            instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance_id)
             for attr, value in kwargs.items():
                 if attr == "approval_status" and value == ApprovalStatus.APPROVED.value:
+                    instance.crm_lead.current_status = instance.requested_status
+                    instance.crm_lead.save()
                     setattr(instance, 'date_approved', datetime.now())
                 if attr == "approval_status" and value == ApprovalStatus.REJECTED.value:
                     setattr(instance, 'date_rejected', datetime.now())

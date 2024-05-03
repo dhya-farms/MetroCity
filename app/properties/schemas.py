@@ -21,7 +21,6 @@ class PropertyCreateSchema(BaseModel):
     description: Optional[str]
     area_of_purpose: AreaOfPurpose
     name: str
-    price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
     details: Optional[Dict[str, Any]] = Field(default_factory=dict)
     location: Optional[str]
     gmap_url: Optional[HttpUrl] = None
@@ -39,9 +38,6 @@ class PropertyCreateSchema(BaseModel):
             raise TypeError('Details must be a dictionary or a JSON string.')
         return v
 
-    _validate_price = validator('price',
-                                allow_reuse=True,
-                                pre=True)(convert_to_decimal)
 
     _validate_property_type = validator('property_type',
                                         allow_reuse=True,
