@@ -50,7 +50,7 @@ class User(AbstractUser):
 
 class Customer(models.Model):
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, blank=True, null=True)
-    favorites = models.ManyToManyField('properties.Property', related_name='favorited_by', blank=True)
+    favorites = models.ManyToManyField('properties.Phase', related_name='favorited_by', blank=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='customers/profile_images/', blank=True, null=True)
     mobile_no = models.CharField(max_length=20, blank=True, null=True)
