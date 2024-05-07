@@ -13,7 +13,7 @@ from .models import PropertyImage
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = ['id', 'image', 'is_slider_image', 'slider_image_order']
+        fields = ['id', 'image', 'is_thumbnail', 'is_slider_image', 'slider_image_order']
 
     def validate(self, data):
         """

@@ -8,7 +8,7 @@ from .models import PropertyImage
 class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
     extra = 1  # Specifies the number of empty forms to display
-    fields = ['image', 'is_slider_image', 'slider_image_order']
+    fields = ['image', 'is_thumbnail', 'is_slider_image', 'slider_image_order']
 
 
 class PhaseInline(admin.TabularInline):

@@ -34,6 +34,7 @@ class PropertyImage(models.Model):
     property = models.ForeignKey('Property', related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='property_images/')
     is_slider_image = models.BooleanField(default=False, blank=True, null=True, verbose_name='Use as slider image')
+    is_thumbnail = models.BooleanField(default=False, blank=True, null=True, verbose_name='Use as Home screen image')
     slider_image_order = models.IntegerField(blank=True, null=True, verbose_name='Slider Image Order')
 
     class Meta:
