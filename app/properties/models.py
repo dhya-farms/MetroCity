@@ -37,8 +37,8 @@ class PropertyImage(models.Model):
     slider_image_order = models.IntegerField(blank=True, null=True, verbose_name='Slider Image Order')
 
     class Meta:
-        verbose_name = 'Address'
-        verbose_name_plural = 'Addresses'
+        verbose_name = 'Property Image'
+        verbose_name_plural = 'Property Images'
         ordering = [
             Case(
                 When(is_slider_image=True, then=Value(0)),
