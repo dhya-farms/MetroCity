@@ -1,7 +1,7 @@
 from django.db import models
 from rest_framework import serializers
 
-from app.properties.enums import AreaOfPurpose, PropertyType, PhaseStatus
+from app.properties.enums import AreaOfPurpose, PropertyType
 from app.properties.models import Property, Phase, Plot, PropertyImage
 from app.users.serializers import UserSerializer, CustomerSerializer
 from app.utils.helpers import get_serialized_enum
@@ -94,20 +94,6 @@ class PropertySerializer(serializers.ModelSerializer):
             'phases',
             'price_from'
         ]
-
-
-class PhaseSerializerComplex(serializers.ModelSerializer):
-    property = PropertySerializer()
-    status = serializers.SerializerMethodField()
-
-    def get_status(self, obj: Phase):
-        if obj.status:
-            return get_serialized_enum(PhaseStatus(obj.status))
-        return dict()
-
-    class Meta:
-        model = Phase
-        fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status']
 
 
 class PlotSerializer(serializers.ModelSerializer):

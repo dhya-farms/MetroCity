@@ -8,8 +8,7 @@ from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParamete
 from app.properties.controllers import PropertyController, PhaseController, PlotController
 from app.properties.schemas import PropertyUpdateSchema, PropertyCreateSchema, PropertyListSchema, PhaseCreateSchema, \
     PhaseUpdateSchema, PhaseListSchema, PlotCreateSchema, PlotUpdateSchema, PlotListSchema
-from app.properties.serializers import PropertySerializer, PhaseSerializer, PlotSerializer, PlotSerializerSimple, \
-    PhaseSerializerComplex
+from app.properties.serializers import PropertySerializer, PhaseSerializer, PlotSerializer, PlotSerializerSimple
 from app.utils.constants import CacheKeys
 from app.utils.pagination import CustomPageNumberPagination
 from app.utils.views import BaseViewSet
@@ -129,6 +128,35 @@ class PropertyViewSet(BaseViewSet):
     def make_inactive(self, request, pk, *args, **kwargs):
         return super().make_inactive(request, pk, *args, **kwargs)
 
+    @action(detail=True, methods=['post'], url_path='add-to-favorites')
+    def add_to_favorites(self, request, pk=None):
+        customer = request.user.customer
+        property = self.controller.get_instance_by_pk(pk=pk)
+        if not property:
+            return JsonResponse({"error": "Property with this ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        customer.favorites.add(property)
+        return JsonResponse({'status': 'property added to favorites'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='remove-from-favorites')
+    def remove_from_favorites(self, request, pk=None):
+        customer = request.user.customer
+        property = self.controller.get_instance_by_pk(pk=pk)
+        if not property:
+            return JsonResponse({"error": "Property with this ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        customer.favorites.remove(property)
+        return JsonResponse({'status': 'property removed from favorites'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='my-favourites')
+    def list_favorites(self, request):
+        paginator = CustomPageNumberPagination()
+        customer = request.user.customer
+        queryset = customer.favorites.all()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        if page is not None:
+            res = self.controller.serialize_queryset(page, self.serializer)
+            return paginator.get_paginated_response(res)
+        res = self.controller.serialize_queryset(queryset, self.serializer)
+        return JsonResponse(res, safe=False, status=status.HTTP_200_OK)
 
 
 class PhaseViewSet(BaseViewSet):
@@ -207,36 +235,6 @@ class PhaseViewSet(BaseViewSet):
     @action(methods=['POST'], detail=True)
     def make_inactive(self, request, pk, *args, **kwargs):
         return super().make_inactive(request, pk, *args, **kwargs)
-
-    @action(detail=True, methods=['post'], url_path='add-to-favorites')
-    def add_to_favorites(self, request, pk=None):
-        customer = request.user.customer
-        phase = self.controller.get_instance_by_pk(pk=pk)
-        if not phase:
-            return JsonResponse({"error": "phase with this ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        customer.favorites.add(phase)
-        return JsonResponse({'status': 'phase added to favorites'}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['post'], url_path='remove-from-favorites')
-    def remove_from_favorites(self, request, pk=None):
-        customer = request.user.customer
-        phase = self.controller.get_instance_by_pk(pk=pk)
-        if not phase:
-            return JsonResponse({"error": "phase with this ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        customer.favorites.remove(phase)
-        return JsonResponse({'status': 'phase removed from favorites'}, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['get'], url_path='my-favourites')
-    def list_favorites(self, request):
-        paginator = CustomPageNumberPagination()
-        customer = request.user.customer
-        queryset = customer.favorites.all()
-        page = paginator.paginate_queryset(queryset, request, view=self)
-        if page is not None:
-            res = self.controller.serialize_queryset(page, PhaseSerializerComplex)
-            return paginator.get_paginated_response(res)
-        res = self.controller.serialize_queryset(queryset, self.serializer)
-        return JsonResponse(res, safe=False, status=status.HTTP_200_OK)
 
 
 class PlotViewSet(BaseViewSet):

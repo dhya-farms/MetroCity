@@ -25,7 +25,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     def get_favorites(self, obj):
         # Simplify the output to avoid deep serialization, if needed
-        return [phase.id for phase in obj.favorites.all()]  # Just return a list of property IDs
+        return [prop.id for prop in obj.favorites.all()]  # Just return a list of property IDs
 
     class Meta:
         model = Customer
