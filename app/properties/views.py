@@ -235,7 +235,7 @@ class PhaseViewSet(BaseViewSet):
         if page is not None:
             res = self.controller.serialize_queryset(page, PhaseSerializerComplex)
             return paginator.get_paginated_response(res)
-        res = self.controller.serialize_queryset(queryset, self.serializer)
+        res = self.controller.serialize_queryset(queryset, PhaseSerializerComplex)
         return JsonResponse(res, safe=False, status=status.HTTP_200_OK)
 
 
