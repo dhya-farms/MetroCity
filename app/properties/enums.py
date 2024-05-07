@@ -51,10 +51,11 @@ class Facing(models.IntegerChoices):
 
 
 class SoilType(models.IntegerChoices):
-    LOAMY = 1, 'Loamy'
-    CLAY = 2, 'Clay'
-    SANDY = 3, 'Sandy'
-    PEATY = 4, 'Peaty'
-    SILTY = 5, 'Silty'
-    CHALKY = 6, 'Chalky'
-    GRAVELLY = 7, 'Gravelly'
+    RED = 1, 'Red'
+    LOAMY = 2, 'Loamy'
+    CLAY = 3, 'Clay'
+    SANDY = 4, 'Sandy'
+    PEATY = 5, 'Peaty'
+    SILTY = 6, 'Silty'
+    CHALKY = 7, 'Chalky'
+    GRAVELLY = 8, 'Gravelly'

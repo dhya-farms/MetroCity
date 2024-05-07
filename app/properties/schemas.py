@@ -205,7 +205,7 @@ class PlotCreateSchema(BaseModel):
     soil_type: Optional[SoilType]
     plantation: Optional[str]
     price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
-    area_size: int
+    area_size: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
     area_size_unit: AreaSizeUnit = AreaSizeUnit.SQ_FT
     availability: Optional[Availability]
 
@@ -219,7 +219,7 @@ class PlotCreateSchema(BaseModel):
     _validate_soil_type = validator('soil_type',
                                     allow_reuse=True,
                                     pre=True)(allow_string_rep_of_enum)
-    _validate_price = validator('price',
+    _validate_price = validator('price', 'area_size',
                                 allow_reuse=True,
                                 pre=True)(convert_to_decimal)
 
@@ -234,7 +234,7 @@ class PlotUpdateSchema(BaseModel):
     soil_type: Optional[SoilType]
     plantation: Optional[str]
     price: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
-    area_size: int
+    area_size: Optional[condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))]
     area_size_unit: AreaSizeUnit
     availability: Optional[Availability]
     is_sold: Optional[bool]
@@ -249,7 +249,7 @@ class PlotUpdateSchema(BaseModel):
     _validate_soil_type = validator('soil_type',
                                     allow_reuse=True,
                                     pre=True)(allow_string_rep_of_enum)
-    _validate_price = validator('price',
+    _validate_price = validator('price', 'area_size',
                                 allow_reuse=True,
                                 pre=True)(convert_to_decimal)
 

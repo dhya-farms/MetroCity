@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import JSONField
+from django.db.models import JSONField, Case, When, Value
 
 from app.properties.enums import Facing, SoilType
 from app.properties.enums import Availability, PropertyType, AreaSizeUnit, AreaOfPurpose, PhaseStatus
@@ -30,11 +31,47 @@ class Property(models.Model):
 
 
 class PropertyImage(models.Model):
-    property = models.ForeignKey(Property, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='property_images/')  # Defines the folder where images will be saved
+    property = models.ForeignKey('Property', related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='property_images/')
+    is_slider_image = models.BooleanField(default=False, blank=True, null=True, verbose_name='Use as slider image')
+    slider_image_order = models.IntegerField(blank=True, null=True, verbose_name='Slider Image Order')
+
+    class Meta:
+        verbose_name = 'Address'
+        verbose_name_plural = 'Addresses'
+        ordering = [
+            Case(
+                When(is_slider_image=True, then=Value(0)),
+                default=Value(1),
+                output_field=models.IntegerField(),
+            ),
+            'slider_image_order',  # This sorts slider images by their order
+        ]
 
     def __str__(self):
         return f"{self.property.name} Image"
+
+    def clean(self):
+        """
+        Ensure that if is_slider_image is True, then slider_image_order is not None.
+        """
+        if self.is_slider_image and self.slider_image_order is None:
+            raise ValidationError("Slider image order must be provided if the image is used as a slider image.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        """
+        Ensure that if is_slider_image is True, then slider_image_order is not None.
+        """
+        if self.is_slider_image and self.slider_image_order is None:
+            raise ValidationError("Slider image order must be provided if the image is used as a slider image.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 # Example data for a DTCP PLOTS property
@@ -76,7 +113,7 @@ class Plot(models.Model):
     soil_type = models.IntegerField(choices=SoilType.choices, blank=True, null=True)
     plantation = models.CharField(max_length=45, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    area_size = models.PositiveBigIntegerField(default=0)
+    area_size = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     area_size_unit = models.IntegerField(choices=AreaSizeUnit.choices, null=True, blank=True)
     availability = models.IntegerField(choices=Availability.choices, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -1,11 +1,14 @@
 from django.contrib import admin
 from app.properties.models import Property, Phase, Plot, PropertyImage
 
+from django.contrib import admin
+from .models import PropertyImage
+
 
 class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
     extra = 1  # Specifies the number of empty forms to display
-    fields = ['image']
+    fields = ['image', 'is_slider_image', 'slider_image_order']
 
 
 class PhaseInline(admin.TabularInline):

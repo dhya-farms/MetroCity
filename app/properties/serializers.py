@@ -1,16 +1,27 @@
 from django.db import models
 from rest_framework import serializers
 
-from app.properties.enums import AreaOfPurpose, PropertyType, PhaseStatus
+from app.properties.enums import AreaOfPurpose, PropertyType, PhaseStatus, Facing, SoilType
 from app.properties.models import Property, Phase, Plot, PropertyImage
 from app.users.serializers import UserSerializer, CustomerSerializer
 from app.utils.helpers import get_serialized_enum
+
+from rest_framework import serializers
+from .models import PropertyImage
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = ['id', 'image']
+        fields = ['id', 'image', 'is_slider_image', 'slider_image_order']
+
+    def validate(self, data):
+        """
+        Check that slider_image_order is provided if is_slider_image is True.
+        """
+        if data.get('is_slider_image') and data.get('slider_image_order') is None:
+            raise serializers.ValidationError("Slider image order must be set if the image is used as a slider image.")
+        return data
 
 
 class PhaseSerializerSimple(serializers.ModelSerializer):
@@ -118,12 +129,25 @@ class PhaseSerializerComplex(serializers.ModelSerializer):
 
     class Meta:
         model = Phase
-        fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status', 'no_of_plots', 'sq_ft_from']
+        fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status',
+                  'no_of_plots', 'sq_ft_from']
 
 
 class PlotSerializer(serializers.ModelSerializer):
     phase_details = PhaseSerializer(source='phase', read_only=True)
     property_details = PropertySerializer(source='phase.property', read_only=True)  # Nested property details via phase
+    facing = serializers.SerializerMethodField()
+    soil_type = serializers.SerializerMethodField()
+
+    def get_facing(self, obj):
+        if obj.status:
+            return get_serialized_enum(Facing(obj.status))
+        return dict()
+
+    def get_soil_type(self, obj):
+        if obj.status:
+            return get_serialized_enum(SoilType(obj.status))
+        return dict()
 
     class Meta:
         model = Plot
@@ -133,6 +157,19 @@ class PlotSerializer(serializers.ModelSerializer):
 
 
 class PlotSerializerSimple(serializers.ModelSerializer):
+    facing = serializers.SerializerMethodField()
+    soil_type = serializers.SerializerMethodField()
+
+    def get_facing(self, obj):
+        if obj.status:
+            return get_serialized_enum(Facing(obj.status))
+        return dict()
+
+    def get_soil_type(self, obj):
+        if obj.status:
+            return get_serialized_enum(SoilType(obj.status))
+        return dict()
+
     class Meta:
         model = Plot
         fields = ['id', 'phase', 'plot_number', 'is_corner_site', 'dimensions', 'facing', 'soil_type', 'plantation',
