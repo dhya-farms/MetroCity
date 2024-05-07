@@ -76,7 +76,7 @@ class Plot(models.Model):
     soil_type = models.IntegerField(choices=SoilType.choices, blank=True, null=True)
     plantation = models.CharField(max_length=45, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    area_size = models.PositiveBigIntegerField(default=0)
+    area_size = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     area_size_unit = models.IntegerField(choices=AreaSizeUnit.choices, null=True, blank=True)
     availability = models.IntegerField(choices=Availability.choices, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
