@@ -99,6 +99,17 @@ class PropertySerializer(serializers.ModelSerializer):
 class PhaseSerializerComplex(serializers.ModelSerializer):
     property = PropertySerializer()
     status = serializers.SerializerMethodField()
+    no_of_plots = serializers.SerializerMethodField()
+    sq_ft_from = serializers.SerializerMethodField()
+
+    def get_no_of_plots(self, obj):
+        # Filter to count only plots that are not sold
+        return obj.plots.filter(is_sold=False).count()
+
+    def get_sq_ft_from(self, obj):
+        # Filter to get the minimum price among unsold plots
+        min_sq_ft = obj.plots.filter(is_sold=False).aggregate(models.Min('area_size'))['area_size__min']
+        return min_sq_ft if min_sq_ft is not None else "No unsold plots"
 
     def get_status(self, obj: Phase):
         if obj.status:
@@ -107,7 +118,7 @@ class PhaseSerializerComplex(serializers.ModelSerializer):
 
     class Meta:
         model = Phase
-        fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status']
+        fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status', 'no_of_plots', 'sq_ft_from']
 
 
 class PlotSerializer(serializers.ModelSerializer):
