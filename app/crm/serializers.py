@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from app.crm.enums import PropertyStatus, ApprovalStatus
 from app.crm.models import CRMLead, StatusChangeRequest, LeadStatusLog, SalesOfficerPerformance, Payment, SiteVisit
-from app.properties.serializers import PlotSerializer, PropertySerializer, PhaseSerializer, PlotSerializerSimple
+from app.properties.serializers import PlotSerializer, PropertySerializer, PhaseSerializer, PlotSerializerSimple, \
+    PhaseSerializerComplex
 from app.users.serializers import CustomerSerializer, UserSerializer
 from app.utils.helpers import get_serialized_enum
 
@@ -13,11 +14,17 @@ class CRMLeadSerializer(serializers.ModelSerializer):
     plot = PlotSerializerSimple
     customer = CustomerSerializer()
     assigned_so = UserSerializer()
-    current_status = serializers.SerializerMethodField()
+    current_crm_status = serializers.SerializerMethodField()
+    current_approval_status = serializers.SerializerMethodField()
 
-    def get_current_status(self, obj: CRMLead):
-        if obj.current_status:
-            return get_serialized_enum(PropertyStatus(obj.current_status))
+    def get_current_crm_status(self, obj: CRMLead):
+        if obj.current_crm_status:
+            return get_serialized_enum(PropertyStatus(obj.current_crm_status))
+        return dict()
+
+    def get_current_approval_status(self, obj: CRMLead):
+        if obj.current_approval_status:
+            return get_serialized_enum(ApprovalStatus(obj.current_approval_status))
         return dict()
 
     class Meta:

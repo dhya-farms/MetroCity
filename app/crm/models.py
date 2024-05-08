@@ -15,7 +15,8 @@ class CRMLead(models.Model):
     customer = models.ForeignKey("users.Customer", on_delete=models.CASCADE)
     assigned_so = models.ForeignKey(User, related_name='assigned_crm_leads', on_delete=models.CASCADE, blank=True, null=True)
     details = JSONField(blank=True, null=True)  # Store type-specific details
-    current_status = models.IntegerField(choices=PropertyStatus.choices, blank=True, null=True)
+    current_crm_status = models.IntegerField(choices=PropertyStatus.choices, blank=True, null=True)
+    current_approval_status = models.IntegerField(choices=ApprovalStatus.choices, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -28,7 +29,7 @@ class StatusChangeRequest(models.Model):
     requested_by = models.ForeignKey(User, related_name='requested_changes', on_delete=models.CASCADE, blank=True, null=True)
     approved_by = models.ForeignKey(User, related_name='approved_changes', on_delete=models.CASCADE, blank=True, null=True)
     requested_status = models.IntegerField(choices=PropertyStatus.choices, blank=True, null=True)
-    approval_status = models.IntegerField(choices=ApprovalStatus.choices, blank=True, null=True)
+    approval_status = models.IntegerField(default=ApprovalStatus.PENDING, choices=ApprovalStatus.choices, blank=True, null=True)
     date_requested = models.DateTimeField(auto_now_add=True)
     date_approved = models.DateTimeField(blank=True, null=True)
     date_rejected = models.DateTimeField(blank=True, null=True)

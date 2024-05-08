@@ -86,7 +86,7 @@ class PropertyViewSet(BaseViewSet):
                 "director_id": 101,
                 "current_lead_id": 205
             }
-            )
+                           )
         ]
     )
     def partial_update(self, request, pk, *args, **kwargs):
@@ -111,7 +111,8 @@ class PropertyViewSet(BaseViewSet):
     @extend_schema(
         description="Retrieve a specific property by id",
         parameters=[
-            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int, description='Property ID'),
+            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int,
+                             description='Property ID'),
         ],
         responses={200: PropertySerializer}
     )
@@ -121,7 +122,8 @@ class PropertyViewSet(BaseViewSet):
     @extend_schema(
         description="Make a property inactive",
         parameters=[
-            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int, description='Property ID'),
+            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int,
+                             description='Property ID'),
         ],
         responses={200: OpenApiResponse(description="Property inactivated successfully")}
     )
@@ -130,10 +132,9 @@ class PropertyViewSet(BaseViewSet):
         return super().make_inactive(request, pk, *args, **kwargs)
 
 
-
 class PhaseViewSet(BaseViewSet):
     controller = PhaseController()
-    serializer = PhaseSerializer
+    serializer = PhaseSerializerComplex
     create_schema = PhaseCreateSchema
     update_schema = PhaseUpdateSchema
     list_schema = PhaseListSchema
@@ -190,7 +191,8 @@ class PhaseViewSet(BaseViewSet):
     @extend_schema(
         description="Retrieve a specific phase by id",
         parameters=[
-            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int, description='Phase ID'),
+            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int,
+                             description='Phase ID'),
         ],
         responses={200: PhaseSerializer}
     )
@@ -200,7 +202,8 @@ class PhaseViewSet(BaseViewSet):
     @extend_schema(
         description="Make a phase inactive",
         parameters=[
-            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int, description='Phase ID'),
+            OpenApiParameter(name='pk', location=OpenApiParameter.PATH, required=True, type=int,
+                             description='Phase ID'),
         ],
         responses={200: OpenApiResponse(description="Phase inactivated successfully")}
     )

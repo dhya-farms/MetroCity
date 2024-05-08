@@ -56,5 +56,6 @@ class ApprovalStatus(models.IntegerChoices):
     APPROVED = 2, 'Approved'
     REJECTED = 3, 'Rejected'
     UNDER_REVIEW = 4, 'Under Review'
+    COMPLETED = 5, 'Completed'
     # Add more approval statuses here if needed
 

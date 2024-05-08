@@ -24,12 +24,17 @@ class CRMLeadCreateSchema(BaseModel):
     customer_id: int
     assigned_so_id: int
     details: Optional[Dict[str, Any]] = Field(default_factory=dict)
-    current_status: Optional[PropertyStatus]
+    current_crm_status: Optional[PropertyStatus]
+    current_approval_status: Optional[ApprovalStatus]
 
     # Validator to allow string version of enum value too
-    _validate_current_status = validator('current_status',
-                                         allow_reuse=True,
-                                         pre=True)(allow_string_rep_of_enum)
+    _validate_current_crm_status = validator('current_crm_status',
+                                             allow_reuse=True,
+                                             pre=True)(allow_string_rep_of_enum)
+
+    _validate_current_approval_status = validator('current_approval_status',
+                                                  allow_reuse=True,
+                                                  pre=True)(allow_string_rep_of_enum)
 
 
 # CRMLead Update Schema
@@ -37,12 +42,17 @@ class CRMLeadUpdateSchema(BaseModel):
     phase_id: Optional[int]
     plot_id: Optional[int]
     details: Optional[Dict[str, Any]] = Field(default_factory=dict)
-    current_status: Optional[PropertyStatus]
+    current_crm_status: Optional[PropertyStatus]
+    current_approval_status: Optional[ApprovalStatus]
 
     # Validator to allow string version of enum value too
-    _validate_current_status = validator('current_status',
-                                         allow_reuse=True,
-                                         pre=True)(allow_string_rep_of_enum)
+    _validate_current_crm_status = validator('current_crm_status',
+                                             allow_reuse=True,
+                                             pre=True)(allow_string_rep_of_enum)
+
+    _validate_current_approval_status = validator('current_approval_status',
+                                                  allow_reuse=True,
+                                                  pre=True)(allow_string_rep_of_enum)
 
 
 # CRMLead Listing Schema
@@ -52,12 +62,17 @@ class CRMLeadListSchema(BaseModel):
     plot_id: Optional[int]
     customer_id: Optional[int]
     assigned_so_id: Optional[int]
-    current_status: Optional[PropertyStatus]
+    current_crm_status: Optional[PropertyStatus]
+    current_approval_status: Optional[ApprovalStatus]
 
     # Validator to allow string version of enum value too
-    _validate_current_status = validator('current_status',
-                                         allow_reuse=True,
-                                         pre=True)(allow_string_rep_of_enum)
+    _validate_current_crm_status = validator('current_crm_status',
+                                             allow_reuse=True,
+                                             pre=True)(allow_string_rep_of_enum)
+
+    _validate_current_approval_status = validator('current_approval_status',
+                                                  allow_reuse=True,
+                                                  pre=True)(allow_string_rep_of_enum)
 
 
 # StatusChangeRequest Creation Schema

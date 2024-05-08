@@ -17,18 +17,32 @@ class StatusChangeRequestController(Controller):
     def __init__(self):
         self.model = StatusChangeRequest
 
+    def create(self, **kwargs):
+        try:
+            instance = self.model.objects.create(**kwargs)
+            instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance.pk)
+            crm_lead: CRMLead = instance.crm_lead
+            crm_lead.current_crm_status = instance.requested_status
+            crm_lead.current_approval_status = instance.approval_status
+            crm_lead.save()
+            return None, instance
+        except (IntegrityError, ValueError) as e:
+            return get_serialized_exception(e)
+
     def edit(self, instance_id, **kwargs):
         try:
             instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance_id)
             for attr, value in kwargs.items():
-                if attr == "approval_status" and value == ApprovalStatus.APPROVED.value:
-                    instance.crm_lead.current_status = instance.requested_status
-                    instance.crm_lead.save()
-                    setattr(instance, 'date_approved', datetime.now())
-                if attr == "approval_status" and value == ApprovalStatus.REJECTED.value:
-                    setattr(instance, 'date_rejected', datetime.now())
                 if value:
                     setattr(instance, attr, value)
+                if attr == "approval_status":
+                    crm_lead: CRMLead = instance.crm_lead
+                    crm_lead.current_approval_status = instance.approval_status
+                    crm_lead.save()
+                    if value == ApprovalStatus.APPROVED.value:
+                        setattr(instance, 'date_approved', datetime.now())
+                    if value == ApprovalStatus.REJECTED.value:
+                        setattr(instance, 'date_rejected', datetime.now())
             instance.save()
             return None, instance
         except (IntegrityError, ValueError) as e:
@@ -66,5 +80,3 @@ class SiteVisitController(Controller):
             return None, instance
         except (IntegrityError, ValueError) as e:
             return get_serialized_exception(e)
-
-
