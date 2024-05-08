@@ -34,6 +34,7 @@ class PhaseSerializer(serializers.ModelSerializer):
     no_of_plots = serializers.SerializerMethodField()
     area_size_from = serializers.SerializerMethodField()
     area_size_unit = serializers.SerializerMethodField()
+    price_from = serializers.SerializerMethodField()
 
     def get_no_of_plots(self, obj):
         # Filter to count only plots that are not sold
@@ -51,10 +52,15 @@ class PhaseSerializer(serializers.ModelSerializer):
             return get_serialized_enum(AreaSizeUnit(plot_first.area_size_unit))
         return dict()
 
+    def get_price_from(self, obj):
+        min_price = obj.plots.filter(is_sold=False).aggregate(models.Min('price'))['price__min']
+
+        return min_price if min_price is not None else "No Plots or No unsold plots"
+
     class Meta:
         model = Phase
         fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status',
-                  'no_of_plots', 'area_size_from', 'area_size_unit']
+                  'no_of_plots', 'area_size_from', 'area_size_unit', 'price_from']
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -75,7 +81,6 @@ class PropertySerializer(serializers.ModelSerializer):
         if obj.area_of_purpose:
             return get_serialized_enum(AreaOfPurpose(obj.area_of_purpose))
         return dict()
-
 
     class Meta:
         model = Property
@@ -128,15 +133,8 @@ class PhaseSerializerComplex(serializers.ModelSerializer):
         return dict()
 
     def get_price_from(self, obj):
-        # Initialize variable to store the lowest price found across all phases
-        min_price = None
 
-        current_min_price = obj.plots.filter(is_sold=False).aggregate(models.Min('price'))['price__min']
-
-        # Update min_price if current_min_price is lower
-        if current_min_price is not None:
-            if min_price is None or current_min_price < min_price:
-                min_price = current_min_price
+        min_price = obj.plots.filter(is_sold=False).aggregate(models.Min('price'))['price__min']
 
         return min_price if min_price is not None else "No Plots or No unsold plots"
 
@@ -147,7 +145,7 @@ class PhaseSerializerComplex(serializers.ModelSerializer):
 
 
 class PlotSerializer(serializers.ModelSerializer):
-    phase_details = PhaseSerializer(source='phase', read_only=True)
+    phase_details = PhaseSerializerComplex(source='phase', read_only=True)
     property_details = PropertySerializer(source='phase.property', read_only=True)  # Nested property details via phase
     facing = serializers.SerializerMethodField()
     soil_type = serializers.SerializerMethodField()
@@ -206,7 +204,6 @@ class PlotSerializerSimple(serializers.ModelSerializer):
         if obj.availability:
             return get_serialized_enum(Availability(obj.availability))
         return dict()
-
 
     class Meta:
         model = Plot
