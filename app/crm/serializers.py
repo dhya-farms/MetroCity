@@ -35,7 +35,7 @@ class CRMLeadSerializer(serializers.ModelSerializer):
                 requested_status=obj.current_crm_status,
                 approval_status=obj.current_approval_status
             )
-            return StatusChangeRequestSerializer(request).data
+            return StatusChangeRequestSimpleSerializer(request).data
         except StatusChangeRequest.DoesNotExist:
             return None
 
@@ -44,7 +44,6 @@ class CRMLeadSerializer(serializers.ModelSerializer):
         fields = ['id', 'property', 'phase', 'plot', 'customer', 'assigned_so', 'details',
                   'current_crm_status', 'current_approval_status', 'created_at', 'updated_at',
                   'status_change_request']  # Explicitly list all fields including the custom method field
-
 
 
 class StatusChangeRequestSerializer(serializers.ModelSerializer):
@@ -67,6 +66,31 @@ class StatusChangeRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = StatusChangeRequest
         fields = '__all__'
+
+
+class StatusChangeRequestSimpleSerializer(serializers.ModelSerializer):
+    requested_by = UserSerializer()
+    approved_by = UserSerializer()
+    requested_status = serializers.SerializerMethodField()
+    approval_status = serializers.SerializerMethodField()
+
+    def get_requested_status(self, obj: StatusChangeRequest):
+        if obj.requested_status:
+            return get_serialized_enum(PropertyStatus(obj.requested_status))
+        return dict()
+
+    def get_approval_status(self, obj: StatusChangeRequest):
+        if obj.approval_status:
+            return get_serialized_enum(ApprovalStatus(obj.approval_status))
+        return dict()
+
+    class Meta:
+        model = StatusChangeRequest
+        fields = ["id", "crm_lead",
+                  "requested_by",
+                  "approved_by",
+                  "requested_status",
+                  "approval_status"]
 
 
 class LeadStatusLogSerializer(serializers.ModelSerializer):
