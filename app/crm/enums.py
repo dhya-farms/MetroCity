@@ -37,11 +37,8 @@ class RazorpayWebhookEventType(models.IntegerChoices):
 
 
 class PaymentFor(models.IntegerChoices):
-    TOKEN = 1, 'Token'
-    VISIT = 2, 'Visit'
-    ADVANCE = 3, 'Advance'
-    FULL_PAY = 4, 'Full Pay'
-    # Add more categories here if needed
+    TOKEN = 1, 'Token Advance'
+    BALANCE = 2, 'Balance'
 
 
 class DocumentStatus(models.IntegerChoices):

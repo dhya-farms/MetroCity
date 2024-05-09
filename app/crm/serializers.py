@@ -11,11 +11,12 @@ from app.utils.helpers import get_serialized_enum
 class CRMLeadSerializer(serializers.ModelSerializer):
     property = PropertySerializer()
     phase = PhaseSerializer()
-    plot = PlotSerializerSimple
+    plot = PlotSerializerSimple()
     customer = CustomerSerializer()
     assigned_so = UserSerializer()
     current_crm_status = serializers.SerializerMethodField()
     current_approval_status = serializers.SerializerMethodField()
+    status_change_request = serializers.SerializerMethodField()
 
     def get_current_crm_status(self, obj: CRMLead):
         if obj.current_crm_status:
@@ -27,9 +28,23 @@ class CRMLeadSerializer(serializers.ModelSerializer):
             return get_serialized_enum(ApprovalStatus(obj.current_approval_status))
         return dict()
 
+    def get_status_change_request(self, obj: CRMLead):
+        try:
+            request = StatusChangeRequest.objects.get(
+                crm_lead=obj,
+                requested_status=obj.current_crm_status,
+                approval_status=obj.current_approval_status
+            )
+            return StatusChangeRequestSerializer(request).data
+        except StatusChangeRequest.DoesNotExist:
+            return None
+
     class Meta:
         model = CRMLead
-        fields = '__all__'
+        fields = ['id', 'property', 'phase', 'plot', 'customer', 'assigned_so', 'details',
+                  'current_crm_status', 'current_approval_status', 'created_at', 'updated_at',
+                  'status_change_request']  # Explicitly list all fields including the custom method field
+
 
 
 class StatusChangeRequestSerializer(serializers.ModelSerializer):
