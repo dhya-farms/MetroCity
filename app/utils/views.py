@@ -25,7 +25,7 @@ def get_enum_values(request):
     locale = request.LANGUAGE_CODE
     fields = (
         'PropertyStatus',
-        'PaymentMode',
+        'PaymentMethod',
         'PaymentStatus',
         'PaymentFor',
         'DocumentStatus',

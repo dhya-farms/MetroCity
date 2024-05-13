@@ -1,8 +1,48 @@
 from django.contrib import admin
-from app.properties.models import Property, Phase, Plot, PropertyImage
+from app.properties.models import Property, Phase, Plot, PropertyImage, UpdateImage, Update
 
 from django.contrib import admin
 from .models import PropertyImage
+
+admin.site.register(UpdateImage)
+
+
+class UpdateImageInline(admin.TabularInline):
+    model = UpdateImage
+    extra = 1  # Specifies the number of extra forms in the inline formset.
+
+
+@admin.register(Update)
+class UpdateAdmin(admin.ModelAdmin):
+    list_display = ('title', 'posted_by', 'date_posted', 'id')
+    list_filter = ('date_posted', 'posted_by')
+    search_fields = ('title', 'description', 'posted_by__username')
+    readonly_fields = ('date_posted',)  # 'posted_by' is handled in the form
+
+    inlines = [UpdateImageInline]
+
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'description', 'posted_by')
+        }),
+        ('Date Information', {
+            'fields': ('date_posted',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        Form = super(UpdateAdmin, self).get_form(request, obj, **kwargs)
+        if obj is None:
+            Form.base_fields['posted_by'].queryset = Form.base_fields['posted_by'].queryset.filter(
+                username=request.user.username)
+            Form.base_fields['posted_by'].initial = request.user.id
+        return Form
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating a new instance, set posted_by
+            obj.posted_by = request.user
+        super(UpdateAdmin, self).save_model(request, obj, form, change)
 
 
 class PropertyImageInline(admin.TabularInline):

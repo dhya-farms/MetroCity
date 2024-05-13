@@ -4,7 +4,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from app.crm.views import CRMLeadViewSet, StatusChangeRequestViewSet, PaymentViewSet, SiteVisitViewSet
-from app.properties.views import PropertyViewSet, PlotViewSet, PhaseViewSet
+from app.properties.views import PropertyViewSet, PlotViewSet, PhaseViewSet, UpdateViewSet
 from app.users.views import UserViewSet, CustomerViewSet, OtpLoginViewSet
 from app.utils.views import get_enum_values
 
@@ -16,6 +16,7 @@ else:
 router.register("users", UserViewSet, basename="users")
 router.register("otp", OtpLoginViewSet, basename='otp')
 router.register("customers", CustomerViewSet, basename="customers")
+router.register("updates", UpdateViewSet, basename="updates")
 router.register("properties", PropertyViewSet, basename="properties")
 router.register("phases", PhaseViewSet, basename="phases")
 router.register("plots", PlotViewSet, basename="plots")

@@ -79,9 +79,10 @@ class CRMLeadListSchema(BaseModel):
 class StatusChangeRequestCreateSchema(BaseModel):
     crm_lead_id: int
     requested_by_id: int
-    approved_by_id: Optional[int]
+    actioned_by_id: Optional[int]
     requested_status: PropertyStatus
     approval_status: Optional[ApprovalStatus]
+    remarks: Optional[str]
     date_approved: Optional[datetime]
     date_rejected: Optional[datetime]
 
@@ -97,8 +98,9 @@ class StatusChangeRequestCreateSchema(BaseModel):
 
 # StatusChangeRequest Update Schema
 class StatusChangeRequestUpdateSchema(BaseModel):
-    approved_by_id: Optional[int]
+    actioned_by_id: Optional[int]
     approval_status: Optional[ApprovalStatus]
+    remarks: Optional[str]
 
     # Validator to allow string version of enum value too
     _validate_enums = validator('approval_status',
@@ -110,7 +112,7 @@ class StatusChangeRequestUpdateSchema(BaseModel):
 class StatusChangeRequestListSchema(BaseModel):
     crm_lead_id: Optional[int]
     requested_by_id: Optional[int]
-    approved_by_id: Optional[int]
+    actioned_by_id: Optional[int]
     requested_status: Optional[PropertyStatus]
     approval_status: Optional[ApprovalStatus]
 
@@ -124,48 +126,35 @@ class StatusChangeRequestListSchema(BaseModel):
 class PaymentCreateSchema(BaseModel):
     crm_lead_id: int
     amount: condecimal(max_digits=10, decimal_places=2, ge=Decimal(0))
-    payment_type: PaymentMode
-    payment_status: Optional[PaymentStatus]
-    payment_date: Optional[datetime]
+    payment_method: PaymentMethod
+    payment_status: Optional[PaymentStatus] = PaymentStatus.COMPLETED
     payment_for: PaymentFor
     payment_description: Optional[str]
     reference_number: Optional[str]
 
-    @validator('payment_date', pre=True, allow_reuse=True)
-    def validate_payment_date(cls, v):
-        return parse_datetime(v)
-
     # Validator to allow string version of enum value too
-    _validate_enums = validator('payment_type', 'payment_status', 'payment_for',
+    _validate_enums = validator('payment_method', 'payment_status', 'payment_for',
                                 allow_reuse=True,
                                 pre=True)(allow_string_rep_of_enum)
 
-    _validate_amount = validator('amount',
-                                 allow_reuse=True,
-                                 pre=True)(convert_to_decimal)
 
-
-# Payment Update Schema
 class PaymentUpdateSchema(PaymentCreateSchema):
     pass
 
 
-# Payment Listing Schema
 class PaymentListSchema(BaseModel):
     crm_lead_id: Optional[int]
-    payment_type: Optional[PaymentMode]
+    payment_method: Optional[PaymentMethod]
     payment_status: Optional[PaymentStatus]
     payment_for: Optional[PaymentFor]
     start_time: Optional[datetime]
     end_time: Optional[datetime]
-    online_payment_method: Optional[PaymentMethod]
-    online_payment_status: Optional[bool]
 
     @validator('start_time', 'end_time', pre=True, allow_reuse=True)
     def validate_time(cls, v):
         return parse_datetime(v)
 
-    _validate_enums = validator('payment_type', 'payment_status', 'payment_for', 'online_payment_method',
+    _validate_enums = validator('payment_method', 'payment_status', 'payment_for',
                                 allow_reuse=True, pre=True)(allow_string_rep_of_enum)
 
 

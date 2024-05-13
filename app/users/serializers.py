@@ -1,5 +1,9 @@
 from django.core.validators import RegexValidator
+from django.db.models import Q
 from rest_framework import serializers
+
+from app.crm.enums import PropertyStatus, ApprovalStatus
+from app.crm.models import CRMLead
 from app.users.models import User, Customer
 from app.users.enums import Role
 from app.utils.helpers import get_serialized_enum
@@ -8,11 +12,25 @@ from app.utils.helpers import get_serialized_enum
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.ChoiceField(choices=Role.choices)
     director = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    clients = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'mobile_no', 'role', 'created_at', 'updated_at', 'director', 'email',
+        fields = ['id', 'name', 'mobile_no', 'role', 'points', 'created_at', 'updated_at', 'director', 'clients',
+                  'email',
                   'is_active', 'last_login', 'date_joined']
+
+    def get_clients(self, obj):
+        # Check if the user role is SALES_OFFICER
+        if obj.role == Role.SALES_OFFICER:
+            leads_count = CRMLead.objects.filter(
+                assigned_so=obj
+            ).exclude(
+                Q(current_crm_status=PropertyStatus.DOCUMENT_DELIVERY) |
+                Q(current_approval_status=ApprovalStatus.COMPLETED)
+            ).count()
+            return leads_count
+        return None
 
     def get_role(self, obj):
         if obj.role:

@@ -2,12 +2,29 @@ from django.db import models
 from rest_framework import serializers
 
 from app.properties.enums import AreaOfPurpose, PropertyType, PhaseStatus, Facing, SoilType, AreaSizeUnit, Availability
-from app.properties.models import Property, Phase, Plot, PropertyImage
+from app.properties.models import Property, Phase, Plot, PropertyImage, Update, UpdateImage
 from app.users.serializers import UserSerializer, CustomerSerializer
 from app.utils.helpers import get_serialized_enum
 
 from rest_framework import serializers
 from .models import PropertyImage
+
+from rest_framework import serializers
+
+
+class UpdateImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UpdateImage
+        fields = ['id', 'update', 'image']
+
+
+class UpdateSerializer(serializers.ModelSerializer):
+    posted_by = UserSerializer()
+    images = UpdateImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Update
+        fields = ['id', 'title', 'description', 'posted_by', 'date_posted', 'images']
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -151,6 +168,7 @@ class PlotSerializer(serializers.ModelSerializer):
     soil_type = serializers.SerializerMethodField()
     area_size_unit = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
 
     def get_facing(self, obj: Plot):
         if obj.facing:
@@ -172,11 +190,16 @@ class PlotSerializer(serializers.ModelSerializer):
             return get_serialized_enum(Availability(obj.availability))
         return dict()
 
+    def get_total_amount(self, obj: Plot):
+        if obj.price is not None and obj.area_size is not None:
+            return obj.price * obj.area_size
+        return None
+
     class Meta:
         model = Plot
         fields = ['id', 'plot_number', 'is_corner_site', 'dimensions', 'facing', 'soil_type', 'plantation', 'price',
                   'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_sold', 'phase_details',
-                  'property_details']
+                  'property_details', 'total_amount']
 
 
 class PlotSerializerSimple(serializers.ModelSerializer):
@@ -184,6 +207,7 @@ class PlotSerializerSimple(serializers.ModelSerializer):
     soil_type = serializers.SerializerMethodField()
     area_size_unit = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
 
     def get_facing(self, obj: Plot):
         if obj.facing:
@@ -205,7 +229,13 @@ class PlotSerializerSimple(serializers.ModelSerializer):
             return get_serialized_enum(Availability(obj.availability))
         return dict()
 
+    def get_total_amount(self, obj: Plot):
+        if obj.price is not None and obj.area_size is not None:
+            return obj.price * obj.area_size
+        return None
+
     class Meta:
         model = Plot
         fields = ['id', 'phase', 'plot_number', 'is_corner_site', 'dimensions', 'facing', 'soil_type', 'plantation',
-                  'price', 'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_sold']
+                  'price', 'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_sold',
+                  'total_amount']

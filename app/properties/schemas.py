@@ -15,6 +15,10 @@ from app.utils.helpers import allow_string_rep_of_enum, convert_to_decimal
 User = get_user_model()
 
 
+class UpdateListSchema(BaseModel):
+    pass
+
+
 # Property Creation Schema
 class PropertyCreateSchema(BaseModel):
     property_type: PropertyType

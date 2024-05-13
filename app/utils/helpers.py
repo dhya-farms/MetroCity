@@ -5,7 +5,8 @@ from urllib import request, parse
 from django.conf import settings
 from django.utils import translation
 
-from app.crm.enums import PropertyStatus, PaymentStatus, PaymentFor, DocumentStatus, PaymentMode, ApprovalStatus
+from app.crm.enums import PropertyStatus, PaymentStatus, PaymentFor, DocumentStatus, PaymentMode, ApprovalStatus, \
+    PaymentMethod
 from app.files.enums import FileUploadStrategy, FileUsageType, CRMDocumentType, FileUploadStorage
 from app.properties.enums import Availability, PhaseStatus, PropertyType, AreaOfPurpose, AreaSizeUnit, Facing, SoilType
 from app.users.enums import Role
@@ -16,7 +17,7 @@ from app.utils.serializers import EnumValueSerializer
 def get_data_for_field(field, locale):
     mapping = {
         'PropertyStatus': PropertyStatus,
-        'PaymentMode': PaymentMode,
+        'PaymentMethod': PaymentMethod,
         'PaymentStatus': PaymentStatus,
         'PaymentFor': PaymentFor,
         'DocumentStatus': DocumentStatus,

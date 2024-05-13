@@ -16,11 +16,12 @@ class PaymentMode(models.IntegerChoices):
 
 
 class PaymentMethod(models.IntegerChoices):
-    CREDIT_CARD = 1, 'Credit Card'
-    DEBIT_CARD = 2, 'Debit Card'
-    NET_BANKING = 3, 'Net Banking'
-    UPI = 4, 'UPI'
-    RAZORPAY = 5, 'Razorpay'
+    UPI = 1, 'UPI Payment'
+    CASH = 2, 'Cash Payment'
+    CHEQUE = 3, 'Cheque Payment'
+    DD = 4, 'Demand Draft'
+    BANK_TRANSFER = 5, 'Bank Transfer'
+    LOAN = 6, 'Loan'
 
 
 class PaymentStatus(models.IntegerChoices):

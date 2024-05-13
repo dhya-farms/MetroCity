@@ -11,7 +11,6 @@ from app.utils.helpers import generate_random_username
 
 
 class User(AbstractUser):
-
     username_validator = UnicodeUsernameValidator()
 
     name = models.CharField(max_length=255)
@@ -23,14 +22,18 @@ class User(AbstractUser):
         error_messages={
             'unique': _("A user with that username already exists."),
         },
-        default=generate_random_username(),
+        default=generate_random_username,
         unique=True
     )
     email = models.EmailField(_('email address'), unique=True, blank=True, null=True)
-    mobile_no = models.CharField(max_length=10, unique=True, validators=[
-        RegexValidator(regex=r'^\d{10}$', message="Provide Proper 10 digit Phone Number")],
-                                 db_index=True, blank=True, null=True)
+    mobile_no = models.CharField(
+        max_length=10, unique=True, validators=[
+            RegexValidator(regex=r'^\d{10}$', message="Provide Proper 10 digit Phone Number")
+        ],
+        db_index=True, blank=True, null=True
+    )
     role = models.IntegerField(choices=Role.choices, blank=True, null=True)
+    points = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     director = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name="sales_officers")

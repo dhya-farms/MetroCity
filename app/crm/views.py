@@ -126,7 +126,7 @@ class StatusChangeRequestViewSet(BaseViewSet):
             OpenApiExample('Status Change Request Creation JSON', value={
                 "crm_lead_id": 1,
                 "requested_by_id": 2,
-                "approved_by_id": 3,
+                "actioned_by_id": 3,
                 "requested_status": 1,
                 "approval_status": 1,
                 "date_approved": "2023-01-01T00:00:00Z",
@@ -145,7 +145,7 @@ class StatusChangeRequestViewSet(BaseViewSet):
             OpenApiExample('Status Change Request Update JSON', value={
                 "crm_lead_id": 1,
                 "requested_by_id": 2,
-                "approved_by_id": 3,
+                "actioned_by_id": 3,
                 "requested_status": 1,
                 "approval_status": 1,
                 "date_approved": "2023-01-01T00:00:00Z",
@@ -161,7 +161,7 @@ class StatusChangeRequestViewSet(BaseViewSet):
         parameters=[
             OpenApiParameter(name='crm_lead_id', type=int),
             OpenApiParameter(name='requested_by_id', type=int),
-            OpenApiParameter(name='approved_by_id', type=int),
+            OpenApiParameter(name='actioned_by_id', type=int),
             OpenApiParameter(name='requested_status', type=int),
             OpenApiParameter(name='approval_status', type=int),
             # Include other parameters as needed

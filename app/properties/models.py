@@ -9,6 +9,24 @@ from app.properties.enums import Availability, PropertyType, AreaSizeUnit, AreaO
 User = get_user_model()
 
 
+class Update(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    posted_by = models.ForeignKey(User, related_name='updates', on_delete=models.CASCADE)
+    date_posted = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} by {self.posted_by}"
+
+
+class UpdateImage(models.Model):
+    update = models.ForeignKey(Update, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='update_images/')
+
+    def __str__(self):
+        return f"Image for {self.update.title}"
+
+
 class Property(models.Model):
     property_type = models.IntegerField(choices=PropertyType.choices)
     description = models.TextField(blank=True, null=True)

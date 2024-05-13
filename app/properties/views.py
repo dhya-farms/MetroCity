@@ -5,14 +5,28 @@ from rest_framework import status
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 
-from app.properties.controllers import PropertyController, PhaseController, PlotController
+from app.properties.controllers import PropertyController, PhaseController, PlotController, UpdateController
 from app.properties.schemas import PropertyUpdateSchema, PropertyCreateSchema, PropertyListSchema, PhaseCreateSchema, \
-    PhaseUpdateSchema, PhaseListSchema, PlotCreateSchema, PlotUpdateSchema, PlotListSchema
+    PhaseUpdateSchema, PhaseListSchema, PlotCreateSchema, PlotUpdateSchema, PlotListSchema, UpdateListSchema
 from app.properties.serializers import PropertySerializer, PhaseSerializer, PlotSerializer, PlotSerializerSimple, \
-    PhaseSerializerComplex
+    PhaseSerializerComplex, UpdateSerializer
 from app.utils.constants import CacheKeys
 from app.utils.pagination import CustomPageNumberPagination
 from app.utils.views import BaseViewSet
+
+
+class UpdateViewSet(BaseViewSet):
+    controller = UpdateController()
+    serializer = UpdateSerializer
+    list_schema = UpdateListSchema
+    cache_key_retrieve = CacheKeys.PROPERTY_DETAILS_BY_PK
+    cache_key_list = CacheKeys.PROPERTY_LIST
+
+    def list(self, request, **kwargs):
+        return super().list(request, **kwargs)
+
+    def retrieve(self, request, pk, *args, **kwargs):
+        return super().retrieve(request, pk, *args, **kwargs)
 
 
 class PropertyViewSet(BaseViewSet):
