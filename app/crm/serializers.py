@@ -45,24 +45,34 @@ class CRMLeadSerializer(serializers.ModelSerializer):
             return None
 
     def get_is_site_visit_done(self, obj: CRMLead):
-        return obj.current_crm_status > PropertyStatus.SITE_VISIT or (
-                obj.current_crm_status == PropertyStatus.SITE_VISIT and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        if obj.current_crm_status:
+            return obj.current_crm_status > PropertyStatus.SITE_VISIT or \
+                (obj.current_crm_status == PropertyStatus.SITE_VISIT and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        return False
 
     def get_is_token_advance_done(self, obj: CRMLead):
-        return obj.current_crm_status > PropertyStatus.TOKEN_ADVANCE or (
-                obj.current_crm_status == PropertyStatus.TOKEN_ADVANCE and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        if obj.current_crm_status:
+            return obj.current_crm_status > PropertyStatus.TOKEN_ADVANCE or \
+                (obj.current_crm_status == PropertyStatus.TOKEN_ADVANCE and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        return False
 
     def get_is_documentation_done(self, obj: CRMLead):
-        return obj.current_crm_status > PropertyStatus.DOCUMENTATION or (
-                obj.current_crm_status == PropertyStatus.DOCUMENTATION and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        if obj.current_crm_status:
+            return obj.current_crm_status > PropertyStatus.DOCUMENTATION or (
+                    obj.current_crm_status == PropertyStatus.DOCUMENTATION and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        return False
 
     def get_is_payment_done(self, obj: CRMLead):
-        return obj.current_crm_status > PropertyStatus.PAYMENT or (
-                obj.current_crm_status == PropertyStatus.PAYMENT and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        if obj.current_crm_status:
+            return obj.current_crm_status > PropertyStatus.PAYMENT or (
+                    obj.current_crm_status == PropertyStatus.PAYMENT and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        return False
 
     def get_is_document_delivery_done(self, obj: CRMLead):
-        return obj.current_crm_status > PropertyStatus.DOCUMENT_DELIVERY or (
-                obj.current_crm_status == PropertyStatus.DOCUMENT_DELIVERY and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        if obj.current_crm_status:
+            return obj.current_crm_status > PropertyStatus.DOCUMENT_DELIVERY or (
+                    obj.current_crm_status == PropertyStatus.DOCUMENT_DELIVERY and obj.current_approval_status == ApprovalStatus.COMPLETED)
+        return False
 
     class Meta:
         model = CRMLead
