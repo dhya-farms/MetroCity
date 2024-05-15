@@ -11,7 +11,7 @@ from app.utils.helpers import get_serialized_enum
 
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.ChoiceField(choices=Role.choices)
-    director = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    director = serializers.SerializerMethodField()
     clients = serializers.SerializerMethodField()
 
     class Meta:
@@ -19,6 +19,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'mobile_no', 'role', 'points', 'created_at', 'updated_at', 'director', 'clients',
                   'email',
                   'is_active', 'last_login', 'date_joined']
+
+    def get_director(self, obj):
+        if obj.director:
+            return {
+                "id": obj.director.id,
+                "name": obj.director.name
+            }
+        return None
 
     def get_clients(self, obj):
         # Check if the user role is SALES_OFFICER
