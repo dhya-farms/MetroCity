@@ -87,7 +87,7 @@ class PropertySerializer(serializers.ModelSerializer):
     property_type = serializers.SerializerMethodField()
     area_of_purpose = serializers.SerializerMethodField()
     images = PropertyImageSerializer(many=True, read_only=True)
-    phases = PhaseSerializer(many=True, read_only=True)
+    phases = serializers.SerializerMethodField()
 
     def get_property_type(self, obj: Property):
         if obj.property_type:
@@ -98,6 +98,11 @@ class PropertySerializer(serializers.ModelSerializer):
         if obj.area_of_purpose:
             return get_serialized_enum(AreaOfPurpose(obj.area_of_purpose))
         return dict()
+
+    def get_phases(self, obj):
+        # Filter phases to include only those with plots available
+        phases_with_plots = obj.phases.filter(plots__is_sold=False).distinct()
+        return PhaseSerializer(phases_with_plots, many=True).data
 
     class Meta:
         model = Property

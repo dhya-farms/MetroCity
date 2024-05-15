@@ -31,14 +31,6 @@ class File(BaseModel):
         null=True
     )
 
-    # Properties and CRM Lead relations
-    related_property = models.ForeignKey(
-        'properties.Property',
-        related_name='files',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
     crm_lead = models.ForeignKey(
         "crm.CRMLead",
         related_name='files',

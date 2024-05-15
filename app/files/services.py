@@ -36,12 +36,11 @@ class FileStandardUploadService:
     2. The ability to reuse `_infer_file_name_and_type` (which can also be an util)
     """
 
-    def __init__(self, user: User, file_obj, file_usage_type, crm_document_type, property, crm_lead):
+    def __init__(self, user: User, file_obj, file_usage_type, crm_document_type, crm_lead):
         self.user = user
         self.file_obj = file_obj
         self.file_usage_type = file_usage_type
         self.crm_document_type = crm_document_type
-        self.property = property
         self.crm_lead = crm_lead
 
     def _infer_file_name_and_type(self, file_name: str = "", file_type: str = "") -> Tuple[str, str]:
@@ -71,8 +70,7 @@ class FileStandardUploadService:
             file_type=file_type,
             file_usage_type=self.file_usage_type,
             crm_document_type=self.crm_document_type,
-            related_property=self.property,
-            crm_lead=self.crm_lead,
+            crm_lead_id=self.crm_lead,
             uploaded_by=self.user,
             upload_finished_at=timezone.now(),
         )

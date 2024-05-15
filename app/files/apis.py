@@ -5,11 +5,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 
+from app.crm.serializers import CRMLeadSerializer
+from app.files.enums import CRMDocumentType, FileUsageType
 from app.files.models import File
 from app.files.services import (
     FileDirectUploadService,
     FileStandardUploadService,
 )
+from app.users.serializers import UserSerializer
+from app.utils.helpers import get_serialized_enum
 
 
 class FileListApi(APIView):
@@ -18,7 +22,6 @@ class FileListApi(APIView):
         file_type = request.query_params.get('file_type')
         file_usage_type = request.query_params.get('file_usage_type')
         crm_document_type = request.query_params.get('crm_document_type')
-        related_property = request.query_params.get('related_property')
         crm_lead = request.query_params.get('crm_lead')
         uploaded_by = request.query_params.get('uploaded_by')
 
@@ -30,8 +33,6 @@ class FileListApi(APIView):
             query &= Q(file_usage_type=file_usage_type)
         if crm_document_type:
             query &= Q(crm_document_type=crm_document_type)
-        if related_property:
-            query &= Q(related_property_id=int(related_property))
         if crm_lead:
             query &= Q(crm_lead_id=int(crm_lead))
         if uploaded_by:
@@ -43,9 +44,15 @@ class FileListApi(APIView):
         # Create response data
         data = [{
             "id": file.id,
-            "url": file.url,
-            "name": file.original_file_name,
-            # Include other relevant fields as needed
+            "file_url": file.url,
+            "file_name": file.original_file_name,
+            "file_type": file.file_type,
+            "file_usage_type": get_serialized_enum(FileUsageType(file.file_usage_type)),
+            "crm_document_type": get_serialized_enum(CRMDocumentType(file.crm_document_type))
+            if file.crm_document_type else dict(),
+            "crm_lead": CRMLeadSerializer(file.crm_lead).data if file.crm_lead else None,
+            "uploaded_by": UserSerializer(file.uploaded_by).data if uploaded_by else None,
+            "upload_finished_at": file.upload_finished_at
         } for file in files]
 
         return Response(data, status=status.HTTP_200_OK)
@@ -66,14 +73,12 @@ class FileStandardUploadApi(APIView):
         data = request.data
         file_usage_type = data.get('file_usage_type', None)
         crm_document_type = data.get('crm_document_type', None)
-        property = data.get('property', None)
         crm_lead = data.get('crm_lead', None)
         try:
             service = FileStandardUploadService(user=request.user,
                                                 file_obj=request.FILES["file"],
                                                 file_usage_type=file_usage_type,
                                                 crm_document_type=crm_document_type,
-                                                property=int(property) if property else None,
                                                 crm_lead=crm_lead)
             file = service.create()
             res = {"id": file.id}
