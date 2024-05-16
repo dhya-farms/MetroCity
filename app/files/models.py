@@ -17,20 +17,11 @@ class File(BaseModel):
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'])]
     )
-
     original_file_name = models.TextField()
-
     file_name = models.CharField(max_length=255, unique=True)
     file_type = models.CharField(max_length=255)
     file_usage_type = models.IntegerField(choices=FileUsageType.choices, blank=True, null=True)
-
-    # CRM Document Type - only applicable if file_type is CRM_DOCUMENT
-    crm_document_type = models.IntegerField(
-        choices=CRMDocumentType.choices,
-        blank=True,
-        null=True
-    )
-
+    crm_document_type = models.IntegerField(choices=CRMDocumentType.choices, blank=True, null=True)
     crm_lead = models.ForeignKey(
         "crm.CRMLead",
         related_name='files',
@@ -38,17 +29,12 @@ class File(BaseModel):
         null=True,
         blank=True
     )
-
-    # As a specific behavior,
-    # We might want to preserve files after the uploader has been deleted.
-    # In case you want to delete the files too, use models.CASCADE & drop the null=True
     uploaded_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         related_name='uploaded_files'
     )
-
     upload_finished_at = models.DateTimeField(blank=True, null=True)
 
     @property

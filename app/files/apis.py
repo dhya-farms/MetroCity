@@ -51,7 +51,7 @@ class FileListApi(APIView):
             "crm_document_type": get_serialized_enum(CRMDocumentType(file.crm_document_type))
             if file.crm_document_type else dict(),
             "crm_lead": CRMLeadSerializer(file.crm_lead).data if file.crm_lead else None,
-            "uploaded_by": UserSerializer(file.uploaded_by).data if uploaded_by else None,
+            "uploaded_by": UserSerializer(file.uploaded_by).data if file.uploaded_by else None,
             "upload_finished_at": file.upload_finished_at
         } for file in files]
 
@@ -61,11 +61,21 @@ class FileListApi(APIView):
 class FileRetrieveApi(APIView):
     def get(self, request, file_id):
         file = get_object_or_404(File, id=file_id)
-        return Response({
+        # Create response data
+        data = {
             "id": file.id,
-            "url": file.url,
-            "name": file.original_file_name
-        })
+            "file_url": file.url,
+            "file_name": file.original_file_name,
+            "file_type": file.file_type,
+            "file_usage_type": get_serialized_enum(FileUsageType(file.file_usage_type)),
+            "crm_document_type": get_serialized_enum(CRMDocumentType(file.crm_document_type))
+            if file.crm_document_type else dict(),
+            "crm_lead": CRMLeadSerializer(file.crm_lead).data if file.crm_lead else None,
+            "uploaded_by": UserSerializer(file.uploaded_by).data if file.uploaded_by else None,
+            "upload_finished_at": file.upload_finished_at
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class FileStandardUploadApi(APIView):

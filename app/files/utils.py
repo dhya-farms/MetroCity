@@ -1,7 +1,9 @@
+import os
 import pathlib
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
 from django.urls import reverse
 
 
@@ -12,7 +14,12 @@ def file_generate_name(original_file_name):
 
 
 def file_generate_upload_path(instance, filename):
-    return f"files/{instance.file_name}"
+    # Ensure that instance.file_name is correctly set
+    if not instance.file_name:
+        raise SuspiciousFileOperation("File name not set in instance.")
+
+    # Generate the upload path
+    return os.path.join("files", instance.file_name)
 
 
 def file_generate_local_upload_url(*, file_id: str):

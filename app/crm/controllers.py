@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from app.crm.enums import PropertyStatus, ApprovalStatus, PaymentFor
+from app.crm.enums import PropertyStatus, ApprovalStatus, PaymentFor, PaymentStatus
 from app.crm.models import CRMLead, StatusChangeRequest, LeadStatusLog, SalesOfficerPerformance, Payment, SiteVisit
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from app.crm.schemas import PaymentCreateSchema
 from app.properties.controllers import PlotController
@@ -50,19 +50,40 @@ class StatusChangeRequestController(Controller):
 
     def edit(self, instance_id, **kwargs):
         try:
-            instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance_id)
-            for attr, value in kwargs.items():
-                if value:
-                    setattr(instance, attr, value)
-                if attr == "approval_status":
-                    crm_lead: CRMLead = instance.crm_lead
-                    crm_lead.current_approval_status = instance.approval_status
+            with transaction.atomic():
+                instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance_id)
+                crm_lead: CRMLead = instance.crm_lead
+
+                for attr, value in kwargs.items():
+                    if value:
+                        setattr(instance, attr, value)
+
+                if 'approval_status' in kwargs:
+                    crm_lead.current_approval_status = kwargs['approval_status']
                     crm_lead.save()
-                    if value == ApprovalStatus.APPROVED.value:
-                        setattr(instance, 'date_approved', datetime.now())
-                    if value == ApprovalStatus.REJECTED.value:
-                        setattr(instance, 'date_rejected', datetime.now())
-            instance.save()
+
+                    if kwargs['approval_status'] == ApprovalStatus.APPROVED.value:
+                        if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
+                            approved_token_advance = Payment.objects.filter(
+                                crm_lead=crm_lead, payment_for=PaymentFor.TOKEN.value
+                            ).first()
+                            if approved_token_advance:
+                                approved_token_advance.payment_status = PaymentStatus.COMPLETED
+                                approved_token_advance.save()
+                        instance.date_approved = datetime.now()
+
+                    elif kwargs['approval_status'] == ApprovalStatus.REJECTED.value:
+                        if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
+                            rejected_token_advance = Payment.objects.filter(
+                                crm_lead=crm_lead, payment_for=PaymentFor.TOKEN.value
+                            ).first()
+                            if rejected_token_advance:
+                                rejected_token_advance.payment_status = PaymentStatus.FAILED
+                                rejected_token_advance.save()
+                        instance.date_rejected = datetime.now()
+
+                instance.save()
+
             return None, instance
         except (IntegrityError, ValueError) as e:
             return get_serialized_exception(e)

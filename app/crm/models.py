@@ -73,7 +73,7 @@ class Payment(models.Model):
     crm_lead = models.ForeignKey(CRMLead, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     payment_method = models.PositiveSmallIntegerField(choices=PaymentMethod.choices, blank=True, null=True)
-    payment_status = models.IntegerField(choices=PaymentStatus.choices, default=PaymentStatus.COMPLETED)
+    payment_status = models.IntegerField(choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
     payment_date = models.DateTimeField(default=now)  # Ensures it's set at creation time
     payment_for = models.IntegerField(choices=PaymentFor.choices)
     payment_description = models.CharField(max_length=45, blank=True, null=True)
