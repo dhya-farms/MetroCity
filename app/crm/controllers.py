@@ -17,17 +17,34 @@ class CRMLeadController(Controller):
 
     def edit(self, instance_id, **kwargs):
         try:
-            instance = self.model.objects.get(id=instance_id)
-            for attr, value in kwargs.items():
-                if attr == 'plot_id':
-                    selected_plot: Plot = PlotController().get_instance_by_pk(value)
+            with transaction.atomic():
+                instance: CRMLead = self.model.objects.get(id=instance_id)
+
+                # Update plot if plot_id is provided
+                plot_id = kwargs.get('plot_id')
+                if plot_id:
+                    selected_plot: Plot = PlotController().get_instance_by_pk(plot_id)
                     if selected_plot:
                         selected_plot.is_sold = True
                         selected_plot.save()
-                if value:
-                    setattr(instance, attr, value)
-            instance.save()
-            return None, instance
+
+                # Update instance attributes
+                for attr, value in kwargs.items():
+                    if attr != 'plot_id' and value:
+                        setattr(instance, attr, value)
+
+                # Handle status change request
+                if (kwargs.get('current_crm_status') == PropertyStatus.DOCUMENTATION.value and
+                    kwargs.get('current_approval_status') == ApprovalStatus.PENDING.value):
+                    StatusChangeRequestController().create(
+                        crm_lead=instance,
+                        requested_by=instance.assigned_so,
+                        requested_status=instance.current_crm_status,
+                        approval_status=instance.current_approval_status
+                    )
+
+                instance.save()
+                return None, instance
         except (IntegrityError, ValueError) as e:
             return get_serialized_exception(e)
 
