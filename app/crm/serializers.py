@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Sum
 from rest_framework import serializers
 
 from app.crm.enums import PropertyStatus, ApprovalStatus, PaymentMethod, PaymentStatus, PaymentFor
@@ -17,11 +18,16 @@ class CRMLeadSerializer(serializers.ModelSerializer):
     current_crm_status = serializers.SerializerMethodField()
     current_approval_status = serializers.SerializerMethodField()
     status_change_request = serializers.SerializerMethodField()
+    amount_to_paid = serializers.SerializerMethodField()
     is_site_visit_done = serializers.SerializerMethodField()
     is_token_advance_done = serializers.SerializerMethodField()
     is_documentation_done = serializers.SerializerMethodField()
     is_payment_done = serializers.SerializerMethodField()
     is_document_delivery_done = serializers.SerializerMethodField()
+
+    def get_amount_to_paid(self, obj: CRMLead):
+        total_paid_amount = obj.payments.aggregate(Sum('amount'))['amount__sum'] or 0
+        return obj.total_amount - total_paid_amount if obj.total_amount else None
 
     def get_current_crm_status(self, obj: CRMLead):
         if obj.current_crm_status:
@@ -76,7 +82,7 @@ class CRMLeadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CRMLead
-        fields = ['id', 'is_active', 'property', 'phase', 'plot', 'total_amount', 'customer', 'assigned_so', 'details',
+        fields = ['id', 'is_active', 'property', 'phase', 'plot', 'total_amount', 'amount_to_paid', 'customer', 'assigned_so', 'details',
                   'current_crm_status', 'current_approval_status', 'created_at', 'updated_at',
                   'status_change_request', 'is_site_visit_done', 'is_token_advance_done',
                   'is_documentation_done', 'is_payment_done', 'is_document_delivery_done']

@@ -74,7 +74,7 @@ class SalesOfficerPerformance(models.Model):
 
 
 class Payment(models.Model):
-    crm_lead = models.ForeignKey(CRMLead, on_delete=models.CASCADE)
+    crm_lead = models.ForeignKey(CRMLead, related_name='payments', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     payment_method = models.PositiveSmallIntegerField(choices=PaymentMethod.choices, blank=True, null=True)
     payment_status = models.IntegerField(choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
