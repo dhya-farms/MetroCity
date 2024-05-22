@@ -25,6 +25,10 @@ class CRMLead(models.Model):
     current_approval_status = models.IntegerField(choices=ApprovalStatus.choices, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(
+        'active',
+        default=True,
+    )
 
     def __str__(self):
         return f"CRM Lead {self.id} Property-{self.property.name} Customer-{self.customer.name} SO-{self.assigned_so.name}"

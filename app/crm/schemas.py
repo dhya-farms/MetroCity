@@ -64,6 +64,7 @@ class CRMLeadListSchema(BaseModel):
     assigned_so_id: Optional[int]
     current_crm_status: Optional[PropertyStatus]
     current_approval_status: Optional[ApprovalStatus]
+    is_active: Optional[bool] = True
 
     # Validator to allow string version of enum value too
     _validate_current_crm_status = validator('current_crm_status',

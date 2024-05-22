@@ -6,8 +6,9 @@ from app.crm.models import CRMLead, StatusChangeRequest, LeadStatusLog, SalesOff
 
 
 class CRMLeadAdmin(admin.ModelAdmin):
-    list_display = ['id', 'property', 'customer', 'assigned_so', 'current_crm_status', 'current_approval_status', 'created_at', 'updated_at']
-    list_filter = ['current_crm_status', 'current_approval_status', 'created_at']
+    list_display = ['id', 'property', 'customer', 'assigned_so', 'current_crm_status', 'current_approval_status',
+                    'is_active', 'created_at', 'updated_at']
+    list_filter = ['current_crm_status', 'current_approval_status', 'created_at', 'is_active']
     search_fields = ['customer__name', 'property__name']
 
 

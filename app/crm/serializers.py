@@ -76,7 +76,7 @@ class CRMLeadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CRMLead
-        fields = ['id', 'property', 'phase', 'plot', 'total_amount', 'customer', 'assigned_so', 'details',
+        fields = ['id', 'is_active', 'property', 'phase', 'plot', 'total_amount', 'customer', 'assigned_so', 'details',
                   'current_crm_status', 'current_approval_status', 'created_at', 'updated_at',
                   'status_change_request', 'is_site_visit_done', 'is_token_advance_done',
                   'is_documentation_done', 'is_payment_done', 'is_document_delivery_done']
