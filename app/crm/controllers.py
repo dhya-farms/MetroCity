@@ -162,11 +162,11 @@ class PaymentController(Controller):
                     crm_lead.save()
 
                 elif payment_for == PaymentFor.BALANCE.value:
-                    first_balance_payment = Payment.objects.filter(
+                    balance_payments_count = Payment.objects.filter(
                         crm_lead=crm_lead, payment_for=PaymentFor.BALANCE.value
-                    ).first()
+                    ).count()
 
-                    if not first_balance_payment:
+                    if balance_payments_count == 1:
                         crm_lead.current_crm_status = PropertyStatus.PAYMENT
                         crm_lead.current_approval_status = ApprovalStatus.PENDING
                         crm_lead.save()
