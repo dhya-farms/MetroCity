@@ -65,45 +65,68 @@ class StatusChangeRequestController(Controller):
         except (IntegrityError, ValueError) as e:
             return get_serialized_exception(e)
 
-    def edit(self, instance_id, **kwargs):
-        try:
-            with transaction.atomic():
-                instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance_id)
-                crm_lead: CRMLead = instance.crm_lead
 
-                for attr, value in kwargs.items():
-                    if value:
-                        setattr(instance, attr, value)
+def edit(self, instance_id, **kwargs):
+    try:
+        with transaction.atomic():
+            instance: StatusChangeRequest = self.model.objects.select_related('crm_lead').get(id=instance_id)
+            crm_lead: CRMLead = instance.crm_lead
 
-                if 'approval_status' in kwargs:
-                    crm_lead.current_approval_status = kwargs['approval_status']
-                    crm_lead.save()
+            # Update instance attributes
+            for attr, value in kwargs.items():
+                if value:
+                    setattr(instance, attr, value)
 
-                    if kwargs['approval_status'] == ApprovalStatus.APPROVED.value:
-                        if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
-                            approved_token_advance = Payment.objects.filter(
-                                crm_lead=crm_lead, payment_for=PaymentFor.TOKEN.value
-                            ).first()
-                            if approved_token_advance:
-                                approved_token_advance.payment_status = PaymentStatus.COMPLETED
-                                approved_token_advance.save()
-                        instance.date_approved = datetime.now()
+            if 'approval_status' in kwargs:
+                approval_status = kwargs['approval_status']
+                crm_lead.current_approval_status = approval_status
+                crm_lead.save()
 
-                    elif kwargs['approval_status'] == ApprovalStatus.REJECTED.value:
-                        if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
-                            rejected_token_advance = Payment.objects.filter(
-                                crm_lead=crm_lead, payment_for=PaymentFor.TOKEN.value
-                            ).first()
-                            if rejected_token_advance:
-                                rejected_token_advance.payment_status = PaymentStatus.FAILED
-                                rejected_token_advance.save()
-                        instance.date_rejected = datetime.now()
+                payment_updates = []
 
-                instance.save()
+                if approval_status == ApprovalStatus.APPROVED.value:
+                    if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
+                        token_payment = Payment.objects.filter(
+                            crm_lead=crm_lead, payment_for=PaymentFor.TOKEN.value
+                        ).first()
+                        if token_payment:
+                            token_payment.payment_status = PaymentStatus.COMPLETED
+                            payment_updates.append(token_payment)
+                    if instance.requested_status == PropertyStatus.PAYMENT:
+                        balance_payments = Payment.objects.filter(
+                            crm_lead=crm_lead, payment_for=PaymentFor.BALANCE.value
+                        )
+                        for payment in balance_payments:
+                            payment.payment_status = PaymentStatus.COMPLETED
+                            payment_updates.append(payment)
+                    instance.date_approved = datetime.now()
 
-            return None, instance
-        except (IntegrityError, ValueError) as e:
-            return get_serialized_exception(e)
+                elif approval_status == ApprovalStatus.REJECTED.value:
+                    if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
+                        token_payment = Payment.objects.filter(
+                            crm_lead=crm_lead, payment_for=PaymentFor.TOKEN.value
+                        ).first()
+                        if token_payment:
+                            token_payment.payment_status = PaymentStatus.FAILED
+                            payment_updates.append(token_payment)
+                    if instance.requested_status == PropertyStatus.PAYMENT:
+                        balance_payments = Payment.objects.filter(
+                            crm_lead=crm_lead, payment_for=PaymentFor.BALANCE.value
+                        )
+                        for payment in balance_payments:
+                            payment.payment_status = PaymentStatus.FAILED
+                            payment_updates.append(payment)
+                    instance.date_rejected = datetime.now()
+
+                # Bulk update payments
+                if payment_updates:
+                    Payment.objects.bulk_update(payment_updates, ['payment_status'])
+
+            instance.save()
+
+        return None, instance
+    except (IntegrityError, ValueError) as e:
+        return get_serialized_exception(e)
 
 
 class LeadStatusLogController(Controller):
@@ -122,20 +145,35 @@ class PaymentController(Controller):
 
     def create(self, **kwargs):
         try:
-            instance: Payment = self.model.objects.create(**kwargs)
-            if kwargs.get('payment_for') == PaymentFor.TOKEN.value:
-                StatusChangeRequestController().create(
-                    crm_lead=instance.crm_lead,
-                    requested_by=instance.crm_lead.assigned_so,
-                    requested_status=PropertyStatus.TOKEN_ADVANCE,
-                    approval_status=ApprovalStatus.PENDING
-                )
-                crm_lead: CRMLead = instance.crm_lead
-                crm_lead.current_crm_status = PropertyStatus.TOKEN_ADVANCE
-                crm_lead.current_approval_status = ApprovalStatus.PENDING
-                crm_lead.save()
+            with transaction.atomic():
+                instance: Payment = self.model.objects.create(**kwargs)
 
-            return None, instance
+                crm_lead: CRMLead = instance.crm_lead
+                payment_for = kwargs.get('payment_for')
+
+                if payment_for == PaymentFor.TOKEN.value:
+                    StatusChangeRequestController().create(
+                        crm_lead=crm_lead,
+                        requested_by=crm_lead.assigned_so,
+                        requested_status=PropertyStatus.TOKEN_ADVANCE,
+                        approval_status=ApprovalStatus.PENDING
+                    )
+                    crm_lead.current_crm_status = PropertyStatus.TOKEN_ADVANCE
+                    crm_lead.current_approval_status = ApprovalStatus.PENDING
+                    crm_lead.save()
+
+                elif payment_for == PaymentFor.BALANCE.value:
+                    first_balance_payment = Payment.objects.filter(
+                        crm_lead=crm_lead, payment_for=PaymentFor.BALANCE.value
+                    ).first()
+
+                    if not first_balance_payment:
+                        crm_lead.current_crm_status = PropertyStatus.PAYMENT
+                        crm_lead.current_approval_status = ApprovalStatus.PENDING
+                        crm_lead.save()
+
+                return None, instance
+
         except (IntegrityError, ValueError) as e:
             return get_serialized_exception(e)
 
