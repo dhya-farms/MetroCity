@@ -30,7 +30,7 @@ class CRMLeadController(Controller):
 
                 # Update instance attributes
                 for attr, value in kwargs.items():
-                    if attr != 'plot_id' and value:
+                    if value:
                         setattr(instance, attr, value)
 
                 # Handle status change request
