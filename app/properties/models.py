@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import JSONField, Case, When, Value
 
@@ -35,6 +36,8 @@ class Property(models.Model):
     details = JSONField(blank=True, null=True)  # Store type-specific details
     location = models.TextField(blank=True, null=True)
     gmap_url = models.URLField(max_length=200, blank=True, null=True)
+    rating = models.DecimalField(max_digits=3, default=1.0, decimal_places=1, validators=[
+        MinValueValidator(0.0), MaxValueValidator(5.0)], null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, related_name='created_properties', blank=True, null=True,
