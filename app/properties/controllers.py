@@ -20,7 +20,7 @@ class PropertyController(Controller):
 
     def filter(self, **filters):
         properties_queryset = self.model.objects.filter(
-            phases__plots__is_sold=False
+            phases__plots__is_booked=False
         ).distinct()
         for attr, value in filters.items():
             if value is not None:
@@ -34,7 +34,7 @@ class PhaseController(Controller):
 
     def filter(self, **filters):
         phases_queryset = self.model.objects.filter(
-            plots__is_sold=False
+            plots__is_booked=False
         ).distinct()
         for attr, value in filters.items():
             if value is not None:
@@ -48,7 +48,7 @@ class PlotController(Controller):
 
     def filter(self, **filters):
         plots_queryset = self.model.objects.filter(
-            is_sold=False
+            is_booked=False
         ).distinct()
         for attr, value in filters.items():
             if value is not None:

@@ -34,8 +34,16 @@ class CRMLead(models.Model):
         return f"CRM Lead {self.id} Property-{self.property.name} Customer-{self.customer.name} SO-{self.assigned_so.name}"
 
     def save(self, *args, **kwargs):
+        # Calculate total amount from plot price and area
         if self.plot and self.plot.price and self.plot.area_size:
             self.total_amount = self.plot.price * self.plot.area_size
+
+        # Update plot sold status based on CRM and approval status
+        if self.current_crm_status == PropertyStatus.DOCUMENT_DELIVERY and self.current_approval_status == ApprovalStatus.COMPLETED:
+            if self.plot:
+                self.plot.is_sold = True
+                self.plot.save()
+
         super(CRMLead, self).save(*args, **kwargs)
 
 

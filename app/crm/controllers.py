@@ -20,7 +20,7 @@ class CRMLeadController(Controller):
             with transaction.atomic():
                 instance: CRMLead = self.model.objects.get(id=instance_id)
 
-                # Update plot if plot_id is provided
+                # Update plot as sold if plot_id is provided
                 plot_id = kwargs.get('plot_id')
                 if plot_id:
                     selected_plot: Plot = PlotController().get_instance_by_pk(plot_id)
@@ -82,6 +82,14 @@ class StatusChangeRequestController(Controller):
                     crm_lead.save()
 
                     payment_updates = []
+
+                    if approval_status == ApprovalStatus.COMPLETED.value:
+                        if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:
+                            # Update plot as booked if plot_id is provided
+                            selected_plot: Plot = crm_lead.plot
+                            if selected_plot:
+                                selected_plot.is_booked = True
+                                selected_plot.save()
 
                     if approval_status == ApprovalStatus.APPROVED.value:
                         if instance.requested_status == PropertyStatus.TOKEN_ADVANCE:

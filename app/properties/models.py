@@ -140,6 +140,7 @@ class Plot(models.Model):
     availability = models.IntegerField(choices=Availability.choices, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_booked = models.BooleanField(default=False, blank=True, null=True)
     is_sold = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
