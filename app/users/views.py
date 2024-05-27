@@ -1,4 +1,5 @@
 import random
+from json import loads
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
@@ -12,10 +13,12 @@ from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParamete
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 
 from app.users.controllers import UserController, CustomerController
 from app.users.enums import Role
+from app.users.models import Customer
 from app.users.schemas import UserCreateSchema, UserUpdateSchema, UserListSchema, CustomerCreateSchema, \
     CustomerUpdateSchema, CustomerListSchema
 from app.users.serializers import UserSerializer, CustomerSerializer
@@ -261,6 +264,7 @@ class CustomerViewSet(BaseViewSet):
     list_schema = CustomerListSchema
     cache_key_retrieve = CacheKeys.CUSTOMER_DETAILS_BY_PK
     cache_key_list = CacheKeys.CUSTOMER_LIST
+    parser_classes = (MultiPartParser, FormParser)
 
     @extend_schema(
         description="Create a new customer",
@@ -278,13 +282,27 @@ class CustomerViewSet(BaseViewSet):
         ]
     )
     def create(self, request, *args, **kwargs):
-        # return super().create(request, *args, **kwargs)
-
-        errors, data = self.controller.parse_request(self.create_schema, request.data)
-        if errors:
-            return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
         try:
             with transaction.atomic():
+                data = {}
+                field_names = ['name', 'email', 'mobile_no', 'occupation', 'address', 'preferences', 'image']
+
+                # Collect all fields from the request if they are present
+                for field in field_names:
+                    if field in request.data:
+                        if field == 'preferences':
+                            try:
+                                # Attempt to parse the preferences field as JSON
+                                data[field] = loads(request.data.get(field))
+                            except ValueError:
+                                return JsonResponse({'errors': 'Invalid JSON format for preferences'},
+                                                    status=status.HTTP_400_BAD_REQUEST)
+                        else:
+                            data[field] = request.data.get(field)
+                errors, data = self.controller.parse_request(self.create_schema, data)
+                if errors:
+                    return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
+
                 user = User.objects.create(
                     username=generate_random_username(),
                     name=data.name,
@@ -295,7 +313,14 @@ class CustomerViewSet(BaseViewSet):
                 token, created = Token.objects.get_or_create(user=user)
                 user.auth_token = token
                 user.save()
-                errors, instance = self.controller.create(**data.dict(), user=user, created_by=request.user)
+
+                # Handle file upload
+                if 'image' in request.FILES:
+                    errors, instance = self.controller.create(**data.dict(), image=request.FILES['image'],
+                                                              user=user, created_by=request.user)
+                else:
+                    errors, instance = self.controller.create(**data.dict(), user=user,
+                                                              created_by=request.user)
                 if errors:
                     return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
                 return JsonResponse(data={"customer_id": instance.pk, "user_id": user.pk},

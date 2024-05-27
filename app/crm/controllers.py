@@ -20,14 +20,6 @@ class CRMLeadController(Controller):
             with transaction.atomic():
                 instance: CRMLead = self.model.objects.get(id=instance_id)
 
-                # Update plot as sold if plot_id is provided
-                plot_id = kwargs.get('plot_id')
-                if plot_id:
-                    selected_plot: Plot = PlotController().get_instance_by_pk(plot_id)
-                    if selected_plot:
-                        selected_plot.is_sold = True
-                        selected_plot.save()
-
                 # Update instance attributes
                 for attr, value in kwargs.items():
                     if value:

@@ -2,7 +2,7 @@ from django.db import models
 from rest_framework import serializers
 
 from app.properties.enums import AreaOfPurpose, PropertyType, PhaseStatus, Facing, SoilType, AreaSizeUnit, Availability
-from app.properties.models import Property, Phase, Plot, PropertyImage, Update, UpdateImage
+from app.properties.models import Property, Phase, Plot, PropertyImage, Update, UpdateImage, Amenity, NearbyAttraction
 from app.users.serializers import UserSerializer, CustomerSerializer
 from app.utils.helpers import get_serialized_enum
 
@@ -55,11 +55,11 @@ class PhaseSerializer(serializers.ModelSerializer):
 
     def get_no_of_plots(self, obj):
         # Filter to count only plots that are not sold
-        return obj.plots.filter(is_sold=False).count()
+        return obj.plots.filter(is_booked=False).count()
 
     def get_area_size_from(self, obj):
         # Filter to get the minimum price among unsold plots
-        min_sq_ft = obj.plots.filter(is_sold=False).aggregate(models.Min('area_size'))['area_size__min']
+        min_sq_ft = obj.plots.filter(is_booked=False).aggregate(models.Min('area_size'))['area_size__min']
         return min_sq_ft if min_sq_ft is not None else "No plots or no unsold plots"
 
     def get_area_size_unit(self, obj):
@@ -70,7 +70,7 @@ class PhaseSerializer(serializers.ModelSerializer):
         return dict()
 
     def get_price_from(self, obj):
-        min_price = obj.plots.filter(is_sold=False).aggregate(models.Min('price'))['price__min']
+        min_price = obj.plots.filter(is_booked=False).aggregate(models.Min('price'))['price__min']
 
         return min_price if min_price is not None else "No Plots or No unsold plots"
 
@@ -78,6 +78,18 @@ class PhaseSerializer(serializers.ModelSerializer):
         model = Phase
         fields = ['id', 'property', 'phase_number', 'description', 'start_date', 'estimated_completion_date', 'status',
                   'no_of_plots', 'area_size_from', 'area_size_unit', 'price_from']
+
+
+class AmenitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amenity
+        fields = ['id', 'name', 'logo']
+
+
+class NearbyAttractionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NearbyAttraction
+        fields = ['id', 'name', 'logo']
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -88,6 +100,8 @@ class PropertySerializer(serializers.ModelSerializer):
     area_of_purpose = serializers.SerializerMethodField()
     images = PropertyImageSerializer(many=True, read_only=True)
     phases = serializers.SerializerMethodField()
+    amenities = AmenitySerializer(many=True, read_only=True)
+    nearby_attractions = NearbyAttractionSerializer(many=True, read_only=True)
 
     def get_property_type(self, obj: Property):
         if obj.property_type:
@@ -123,6 +137,8 @@ class PropertySerializer(serializers.ModelSerializer):
             'current_lead',
             'images',
             'phases',
+            'amenities',
+            'nearby_attractions',
         ]
 
 
@@ -136,11 +152,11 @@ class PhaseSerializerComplex(serializers.ModelSerializer):
 
     def get_no_of_plots(self, obj):
         # Filter to count only plots that are not sold
-        return obj.plots.filter(is_sold=False).count()
+        return obj.plots.filter(is_booked=False).count()
 
     def get_area_size_from(self, obj):
         # Filter to get the minimum price among unsold plots
-        min_sq_ft = obj.plots.filter(is_sold=False).aggregate(models.Min('area_size'))['area_size__min']
+        min_sq_ft = obj.plots.filter(is_booked=False).aggregate(models.Min('area_size'))['area_size__min']
         return min_sq_ft if min_sq_ft is not None else "No plots or no unsold plots"
 
     def get_area_size_unit(self, obj):
@@ -157,7 +173,7 @@ class PhaseSerializerComplex(serializers.ModelSerializer):
 
     def get_price_from(self, obj):
 
-        min_price = obj.plots.filter(is_sold=False).aggregate(models.Min('price'))['price__min']
+        min_price = obj.plots.filter(is_booked=False).aggregate(models.Min('price'))['price__min']
 
         return min_price if min_price is not None else "No Plots or No unsold plots"
 
@@ -204,7 +220,8 @@ class PlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plot
         fields = ['id', 'plot_number', 'is_corner_site', 'dimensions', 'facing', 'soil_type', 'plantation', 'price',
-                  'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_sold', 'phase_details',
+                  'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_booked', 'is_sold',
+                  'phase_details',
                   'property_details', 'total_amount']
 
 
@@ -243,5 +260,6 @@ class PlotSerializerSimple(serializers.ModelSerializer):
     class Meta:
         model = Plot
         fields = ['id', 'phase', 'plot_number', 'is_corner_site', 'dimensions', 'facing', 'soil_type', 'plantation',
-                  'price', 'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_sold',
+                  'price', 'area_size', 'area_size_unit', 'availability', 'created_at', 'updated_at', 'is_booked',
+                  'is_sold',
                   'total_amount']

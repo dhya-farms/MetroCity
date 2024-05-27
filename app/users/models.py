@@ -25,6 +25,7 @@ class User(AbstractUser):
         default=generate_random_username,
         unique=True
     )
+    address = models.TextField(blank=True, null=True)
     email = models.EmailField(_('email address'), unique=True, blank=True, null=True)
     mobile_no = models.CharField(
         max_length=10, unique=True, validators=[

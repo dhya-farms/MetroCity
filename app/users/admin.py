@@ -6,7 +6,7 @@ from app.users.models import User, Customer
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('name', 'email', 'mobile_no', 'role', 'points', 'director')}),
+        ('Personal info', {'fields': ('name', 'email', 'address', 'mobile_no', 'role', 'points', 'director')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )

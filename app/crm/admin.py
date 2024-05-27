@@ -1,15 +1,62 @@
-from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
 from app.crm.models import CRMLead, StatusChangeRequest, LeadStatusLog, SalesOfficerPerformance, Payment, SiteVisit
+from django.contrib import admin
+from django.utils.timezone import now
+from datetime import timedelta
+
+
+class UpdatedWithin90DaysFilter(admin.SimpleListFilter):
+    title = 'updated within 90 days'
+    parameter_name = 'updated_recently'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Yes'),
+            ('no', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(updated_at__gte=now() - timedelta(days=90))
+        if self.value() == 'no':
+            return queryset.filter(updated_at__lt=now() - timedelta(days=90))
 
 
 class CRMLeadAdmin(admin.ModelAdmin):
     list_display = ['id', 'property', 'customer', 'assigned_so', 'current_crm_status', 'current_approval_status',
                     'is_active', 'created_at', 'updated_at']
-    list_filter = ['current_crm_status', 'current_approval_status', 'created_at', 'is_active']
+    list_filter = ['current_crm_status', 'current_approval_status', 'created_at', 'is_active',
+                   UpdatedWithin90DaysFilter]
     search_fields = ['customer__name', 'property__name']
+
+    fieldsets = (
+        ('Lead Information', {
+            'fields': ('property', 'customer', 'assigned_so')
+        }),
+        ('Status', {
+            'fields': ('current_crm_status', 'current_approval_status', 'is_active')
+        }),
+        ('Financial', {
+            'fields': ('total_amount',),
+            'description': 'This section contains financial details related to the CRM lead.'
+        }),
+    )
+
+    readonly_fields = ('created_at', 'updated_at')  # Mark these fields as readonly
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        # Add non-editable fields dynamically to avoid the error
+        if obj:  # Check if this is not a new object
+            fieldsets += (
+                ('Timeline', {
+                    'fields': ('created_at', 'updated_at'),
+                    'classes': ('collapse',)  # This will make the section collapsible
+                }),
+            )
+        return fieldsets
 
 
 class StatusChangeRequestAdmin(admin.ModelAdmin):
@@ -31,23 +78,29 @@ class SalesOfficerPerformanceAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'crm_lead_link', 'amount', 'payment_method_display', 'payment_status_display', 'payment_date', 'backend_reference_number')
+    list_display = ('id', 'crm_lead_link', 'amount', 'payment_method_display', 'payment_status_display', 'payment_date',
+                    'backend_reference_number')
     list_filter = ('payment_method', 'payment_status', 'payment_date')
     search_fields = ('crm_lead__id', 'reference_number', 'backend_reference_number')
-    readonly_fields = ('backend_reference_number', 'created_at', 'updated_at')  # Protects auto-generated and timestamp fields
+    readonly_fields = (
+    'backend_reference_number', 'created_at', 'updated_at')  # Protects auto-generated and timestamp fields
     date_hierarchy = 'payment_date'  # Easy navigation through dates
     ordering = ('-payment_date',)
 
     def crm_lead_link(self, obj):
-        return format_html('<a href="{}">{}</a>', reverse("admin:crm_crmlead_change", args=(obj.crm_lead.pk,)), obj.crm_lead)
+        return format_html('<a href="{}">{}</a>', reverse("admin:crm_crmlead_change", args=(obj.crm_lead.pk,)),
+                           obj.crm_lead)
+
     crm_lead_link.short_description = "CRM Lead"
 
     def payment_method_display(self, obj):
         return obj.get_payment_method_display()
+
     payment_method_display.short_description = 'Payment Method'
 
     def payment_status_display(self, obj):
         return obj.get_payment_status_display()
+
     payment_status_display.short_description = 'Payment Status'
 
     fieldsets = (
@@ -55,7 +108,8 @@ class PaymentAdmin(admin.ModelAdmin):
             'fields': ('crm_lead', 'amount', 'payment_description')
         }),
         ('Payment Details', {
-            'fields': ('payment_method', 'payment_status', 'payment_for', 'payment_date', 'reference_number', 'backend_reference_number')
+            'fields': ('payment_method', 'payment_status', 'payment_for', 'payment_date', 'reference_number',
+                       'backend_reference_number')
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at')

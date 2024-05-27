@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app.properties.models import Property, Phase, Plot, PropertyImage, UpdateImage, Update
+from app.properties.models import Property, Phase, Plot, PropertyImage, UpdateImage, Update, Amenity, NearbyAttraction
 
 from django.contrib import admin
 from .models import PropertyImage
@@ -61,18 +61,35 @@ class PlotInline(admin.TabularInline):
     extra = 1
 
 
+# Inline admin for many-to-many relationships
+class AmenityInline(admin.TabularInline):
+    model = Property.amenities.through  # Access the automatically created through model
+    extra = 1
+
+
+class NearbyAttractionInline(admin.TabularInline):
+    model = Property.nearby_attractions.through  # Similarly, access the through model
+    extra = 1
+
+
+admin.site.register(Amenity)
+admin.site.register(NearbyAttraction)
+
+
+# Property admin updates
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'property_type', 'location', 'created_at', 'updated_at']
+    list_display = ['id', 'name', 'property_type', 'location', 'rating', 'created_at', 'updated_at']
     list_filter = ['property_type', 'area_of_purpose', 'created_at', 'updated_at']
     search_fields = ['name', 'description', 'location', 'details']
     inlines = [PropertyImageInline, PhaseInline]
-    readonly_fields = ['created_at', 'updated_at']  # Fields that should be read-only in the admin interface
+    readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
         (None, {'fields': ('name', 'description', 'details')}),
         ('Location Details', {'fields': ('location', 'gmap_url')}),
         ('Classification', {'fields': ('property_type', 'area_of_purpose')}),
-        ('Administrative', {'fields': ('created_by', 'director', 'current_lead', 'created_at', 'updated_at')}),
+        ('Administrative', {'fields': ('rating', 'created_by', 'director', 'current_lead', 'created_at', 'updated_at')}),
+        ('Amenities and Attractions', {'fields': ('amenities', 'nearby_attractions')}),
     )
 
 
@@ -89,8 +106,8 @@ class PhaseAdmin(admin.ModelAdmin):
 
 @admin.register(Plot)
 class PlotAdmin(admin.ModelAdmin):
-    list_display = ['id', 'phase', 'plot_number', 'dimensions', 'is_sold']
-    list_filter = ['is_sold', 'phase', 'availability']
+    list_display = ['id', 'phase', 'plot_number', 'dimensions', 'is_booked', 'is_sold']
+    list_filter = ['is_booked', 'is_sold', 'phase', 'availability']
     search_fields = ['plot_number']
 
     def get_form(self, request, obj=None, **kwargs):

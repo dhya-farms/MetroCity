@@ -17,8 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'mobile_no', 'role', 'points', 'created_at', 'updated_at', 'director', 'clients',
-                  'email',
-                  'is_active', 'last_login', 'date_joined']
+                  'address', 'email', 'is_active', 'last_login', 'date_joined']
 
     def get_director(self, obj):
         if obj.director:

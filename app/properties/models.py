@@ -28,6 +28,22 @@ class UpdateImage(models.Model):
         return f"Image for {self.update.title}"
 
 
+class Amenity(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='amenities_logos/', blank=True, null=True)  # Image file
+
+    def __str__(self):
+        return self.name
+
+
+class NearbyAttraction(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='attractions_logos/', blank=True, null=True)  # Image file
+
+    def __str__(self):
+        return self.name
+
+
 class Property(models.Model):
     property_type = models.IntegerField(choices=PropertyType.choices)
     description = models.TextField(blank=True, null=True)
@@ -46,6 +62,8 @@ class Property(models.Model):
                                  blank=True, null=True)
     current_lead = models.ForeignKey("users.Customer", on_delete=models.CASCADE, blank=True, null=True,
                                      related_name="properties")
+    amenities = models.ManyToManyField(Amenity, blank=True)
+    nearby_attractions = models.ManyToManyField(NearbyAttraction, blank=True)
 
     def __str__(self):
         return f"{self.id} ({self.name})"
