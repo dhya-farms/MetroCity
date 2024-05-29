@@ -115,7 +115,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def get_phases(self, obj):
         # Filter phases to include only those with plots available
-        phases_with_plots = obj.phases.filter(plots__is_sold=False).distinct()
+        phases_with_plots = obj.phases.filter(plots__is_booked=False).distinct()
         return PhaseSerializer(phases_with_plots, many=True).data
 
     class Meta:
