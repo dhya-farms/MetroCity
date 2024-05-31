@@ -12,7 +12,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action
+from rest_framework.decorators import action, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 
@@ -264,7 +264,6 @@ class CustomerViewSet(BaseViewSet):
     list_schema = CustomerListSchema
     cache_key_retrieve = CacheKeys.CUSTOMER_DETAILS_BY_PK
     cache_key_list = CacheKeys.CUSTOMER_LIST
-    parser_classes = (MultiPartParser, FormParser)
 
     @extend_schema(
         description="Create a new customer",
@@ -281,6 +280,7 @@ class CustomerViewSet(BaseViewSet):
             })
         ]
     )
+    @parser_classes((MultiPartParser, FormParser))
     def create(self, request, *args, **kwargs):
         try:
             with transaction.atomic():
