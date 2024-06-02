@@ -66,9 +66,9 @@ class FAQAdmin(admin.ModelAdmin):
 
 
 class UserQueryAdmin(admin.ModelAdmin):
-    list_display = ('short_question', 'is_resolved', 'created_at', 'updated_at')
-    list_filter = ('is_resolved', 'created_at')
-    search_fields = ('question', 'response')
+    list_display = ('short_question', 'user', 'is_resolved', 'created_at', 'updated_at')
+    list_filter = ('is_resolved', 'created_at', 'user')
+    search_fields = ('question', 'response', 'user__username')  # Allow searching by user's username
     readonly_fields = ('created_at', 'updated_at')
 
     def short_question(self, obj):

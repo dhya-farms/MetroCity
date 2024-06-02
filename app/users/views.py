@@ -37,8 +37,7 @@ class UserQueryViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
 
     def perform_create(self, serializer):
-        # Additional logic can be implemented here if needed
-        serializer.save()
+        serializer.save(user=self.request.user)
 
 
 class FAQViewSet(viewsets.ModelViewSet):

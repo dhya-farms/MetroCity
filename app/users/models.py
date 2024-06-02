@@ -64,6 +64,8 @@ class FAQ(models.Model):
 
 
 class UserQuery(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_queries',
+                             help_text="The user who raised this query.", blank=True, null=True)
     question = models.TextField(help_text="User-submitted query.")
     response = models.TextField(blank=True, null=True, help_text="Admin response to the query.")
     is_resolved = models.BooleanField(default=False, help_text="Whether the query has been resolved.")

@@ -52,6 +52,8 @@ class FAQSerializer(serializers.ModelSerializer):
 
 
 class UserQuerySerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=False)
+
     class Meta:
         model = UserQuery
         fields = '__all__'
