@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from app.users.models import User, Customer
+from app.users.models import User, Customer, FAQ, UserQuery
 
 
 class UserAdmin(BaseUserAdmin):
@@ -50,5 +50,34 @@ class CustomerAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('question_preview', 'is_faq', 'created_at', 'updated_at')
+    list_filter = ('is_faq', 'created_at', 'updated_at')
+    search_fields = ('question', 'answer')
+    list_editable = ('is_faq',)
+    fields = ('question', 'answer', 'is_faq', 'created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
+
+    def question_preview(self, obj):
+        """Create a short preview of the question for the list display."""
+        return obj.question[:50] + '...' if len(obj.question) > 50 else obj.question
+
+    question_preview.short_description = "Question Preview"
+
+
+class UserQueryAdmin(admin.ModelAdmin):
+    list_display = ('short_question', 'is_resolved', 'created_at', 'updated_at')
+    list_filter = ('is_resolved', 'created_at')
+    search_fields = ('question', 'response')
+    readonly_fields = ('created_at', 'updated_at')
+
+    def short_question(self, obj):
+        """Create a short preview of the question for the list display."""
+        return obj.question[:50] + '...' if len(obj.question) > 50 else obj.question
+    short_question.short_description = "Question"
+
+
+admin.site.register(UserQuery, UserQueryAdmin)
+admin.site.register(FAQ, FAQAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Customer, CustomerAdmin)

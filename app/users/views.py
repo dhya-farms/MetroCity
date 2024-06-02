@@ -18,16 +18,51 @@ from rest_framework.response import Response
 
 from app.users.controllers import UserController, CustomerController
 from app.users.enums import Role
-from app.users.models import Customer
+from app.users.models import Customer, FAQ, UserQuery
 from app.users.schemas import UserCreateSchema, UserUpdateSchema, UserListSchema, CustomerCreateSchema, \
     CustomerUpdateSchema, CustomerListSchema
-from app.users.serializers import UserSerializer, CustomerSerializer
+from app.users.serializers import UserSerializer, CustomerSerializer, FAQSerializer, UserQuerySerializer
 from app.users.tasks import send_sms
 from app.utils.constants import CacheKeys, SMS
 from app.utils.helpers import mobile_number_validation_check, generate_random_username
+from app.utils.pagination import CustomPageNumberPagination
 from app.utils.views import BaseViewSet
 
 User = get_user_model()
+
+
+class UserQueryViewSet(viewsets.ModelViewSet):
+    queryset = UserQuery.objects.all()
+    serializer_class = UserQuerySerializer
+    pagination_class = CustomPageNumberPagination
+
+    def perform_create(self, serializer):
+        # Additional logic can be implemented here if needed
+        serializer.save()
+
+
+class FAQViewSet(viewsets.ModelViewSet):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned FAQs to those marked as FAQs,
+        by filtering against a `is_faq` query parameter in the URL.
+        """
+        queryset = FAQ.objects.all()
+        queryset = queryset.filter(is_faq=True)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(is_faq=False)
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 
 class OtpLoginViewSet(viewsets.ViewSet):

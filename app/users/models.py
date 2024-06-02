@@ -52,6 +52,28 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"mobile_no": self.mobile_no})
 
 
+class FAQ(models.Model):
+    question = models.TextField(help_text="Frequently asked question.")
+    answer = models.TextField(help_text="Answer to the question.", blank=True, null=True)
+    is_faq = models.BooleanField(default=False, help_text="Designates whether the entry is an approved FAQ.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.question[:50]} - {'FAQ' if self.is_faq else 'Question'}"
+
+
+class UserQuery(models.Model):
+    question = models.TextField(help_text="User-submitted query.")
+    response = models.TextField(blank=True, null=True, help_text="Admin response to the query.")
+    is_resolved = models.BooleanField(default=False, help_text="Whether the query has been resolved.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.question[:50]} - {'Resolved' if self.is_resolved else 'Pending'}"
+
+
 class Customer(models.Model):
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, blank=True, null=True)
     favorites = models.ManyToManyField('properties.Phase', related_name='favorited_by', blank=True)

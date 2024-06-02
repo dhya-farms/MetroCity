@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from app.crm.views import CRMLeadViewSet, StatusChangeRequestViewSet, PaymentViewSet, SiteVisitViewSet
 from app.properties.views import PropertyViewSet, PlotViewSet, PhaseViewSet, UpdateViewSet
-from app.users.views import UserViewSet, CustomerViewSet, OtpLoginViewSet
+from app.users.views import UserViewSet, CustomerViewSet, OtpLoginViewSet, FAQViewSet, UserQueryViewSet
 from app.utils.views import get_enum_values
 
 if settings.DEBUG:
@@ -13,6 +13,8 @@ if settings.DEBUG:
 else:
     router = SimpleRouter()
 
+router.register(r'user_queries', UserQueryViewSet, basename="user_queries")
+router.register(r'faqs', FAQViewSet, basename="faqs")
 router.register("users", UserViewSet, basename="users")
 router.register("otp", OtpLoginViewSet, basename='otp')
 router.register("customers", CustomerViewSet, basename="customers")

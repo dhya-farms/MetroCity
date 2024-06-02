@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from app.crm.enums import PropertyStatus, ApprovalStatus
 from app.crm.models import CRMLead
-from app.users.models import User, Customer
+from app.users.models import User, Customer, FAQ, UserQuery
 from app.users.enums import Role
 from app.utils.helpers import get_serialized_enum
 
@@ -43,6 +43,18 @@ class UserSerializer(serializers.ModelSerializer):
         if obj.role:
             return get_serialized_enum(Role(obj.role))
         return dict()
+
+
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = '__all__'
+
+
+class UserQuerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserQuery
+        fields = '__all__'
 
 
 class CustomerSerializer(serializers.ModelSerializer):
